@@ -319,7 +319,7 @@ process.<span class="hljs-title function_">nextTick</span>(<span class="hljs-key
 <li>主线程不断重复上面的第三步</li>
 </ol>
 <p>上面第三步中的读取任务队列包括以下 6 个阶段<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/801336-20191020172427935-416926087.png" alt="801336-20191020172427935-416926087" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/801336-20191020172427935-416926087.png" alt="801336-20191020172427935-416926087" referrerPolicy="no-referrer"></p>
 <ul>
 <li>timers:执行 setTimeout()和 setInterval()中到期的 callback</li>
 <li>I/O callbacks:上一轮循环中有少数的 I/O callback 会被延迟到这一轮的这一阶段</li>
@@ -348,8 +348,7 @@ process.<span class="hljs-title function_">nextTick</span>(<span class="hljs-key
 <p>一旦 poll queue 为空，则 Event Loop 将检查 timers,如果有 timer 的时间到期，则 Event Loop 将回到 timers 阶段，然后执行 timer queue</p>
 <h3 id="事件循环原理">事件循环原理</h3>
 <ol>
-<li>
-<p>node 的初始化</p>
+<li>node 的初始化
 <ol>
 <li>初始化 node 环境。</li>
 <li>执行输入代码。</li>
@@ -357,8 +356,7 @@ process.<span class="hljs-title function_">nextTick</span>(<span class="hljs-key
 <li>执行 microtasks。</li>
 </ol>
 </li>
-<li>
-<p>进入 event-loop</p>
+<li>进入 event-loop
 <ol>
 <li>
 <p>进入 timers 阶段</p>
@@ -444,7 +442,7 @@ process.<span class="hljs-title function_">nextTick</span>(<span class="hljs-key
 <p>微任务是指 Event Loop 在每个阶段之间执行的任务<br>
 <strong>微任务包括 process.nextTick, Promise.then，Object.observe，MutationObserver</strong></p>
 <p>宏任务与微任务执行顺序图<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/801336-20191020172507873-569608539.png" alt="801336-20191020172507873-569608539" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/801336-20191020172507873-569608539.png" alt="801336-20191020172507873-569608539" referrerPolicy="no-referrer"></p>
 <p>图中绿色小块表示 Event Loop 的各个阶段，执行的是宏任务，粉色箭头表示执行的是微任务</p>
 <p>了解到这里我们再来分析上面的几道题<br>
 题目一的执行结果是：</p>
@@ -766,7 +764,7 @@ promise</code></pre>
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

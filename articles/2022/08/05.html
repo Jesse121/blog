@@ -432,9 +432,9 @@ input 参数是文件绝对路径，output 参数是相对路径</p>
 
   $win.<span class="hljs-property">webContents</span>.<span class="hljs-title function_">closeDevTools</span>();
 &#125;</code></pre>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20220723162320.png" alt="" referrerPolicy="no-referrer"><br>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20220723162320.png" alt="" referrerPolicy="no-referrer"><br>
 窗口创建完后开始加载 vueDevtool,窗口显示的时候自动打开 Devtool，vue DevTool 加载成功<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20220723162642.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20220723162642.png" alt="" referrerPolicy="no-referrer"></p>
 <h3 id="生成日志-electron-log">生成日志 electron-log</h3>
 <p>electron 应用打包后我们要知道当前安装的应用的运行情况，生成本地日志是非常有必要的，这里采用开源工具包 electron-log 实现<br>
 它不仅可以用于 Electron 应用中也可以用在任何 node.js 的应用中。</p>
@@ -538,7 +538,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
   <span class="hljs-keyword">return</span> win;
 &#125;;</code></pre>
 <p>这样就可以新开启一个 update 窗口，访问的是/update 路由<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20220724154522.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20220724154522.png" alt="" referrerPolicy="no-referrer"></p>
 <h3 id="electron-进程间通信">electron 进程间通信</h3>
 <p>为了确保应用安全，自 Electron 12 以来，默认情况下已启用上下文隔离，并且它是所有应用程序推荐的安全设置。<br>
 启用上下文隔离之后，Electron 提供一种专门的模块来无阻地帮助您完成这项工作。 contextBridge 模块可以用来安全地从独立运行、上下文隔离的预加载脚本中暴露 API 给正在运行的渲染进程。<br>
@@ -633,7 +633,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
 <span class="hljs-keyword">const</span> <span class="hljs-title function_">createTray</span> = (<span class="hljs-params">electronApp: IElectronApp</span>) =&gt; &#123;
   <span class="hljs-comment">// 生成托盘图标及其菜单项实例</span>
   $tray = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Tray</span>(
-    path.<span class="hljs-title function_">join</span>(__dirname, <span class="hljs-string">&quot;../../../resources/icons/png/16x16.png&quot;</span>)
+    path.<span class="hljs-title function_">join</span>(__dirname, <span class="hljs-string">&quot;../../../resources/icons/png/16x16.png&quot;</span>),
   );
   <span class="hljs-comment">// 设置鼠标悬浮时的标题</span>
   $tray.<span class="hljs-title function_">setToolTip</span>(<span class="hljs-string">&quot;ElectronApp&quot;</span>);
@@ -641,7 +641,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
   <span class="hljs-title function_">setMenu</span>(electronApp);
 &#125;;</code></pre>
 <p>可以看到托盘菜单已生成<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20220801141913.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20220801141913.png" alt="" referrerPolicy="no-referrer"></p>
 <h3 id="全量更新与增量更新">全量更新与增量更新</h3>
 <h4 id="全量更新">全量更新</h4>
 <p>全量更新是利用官方提供的 autoUpdater 来实现的，即将打包后的新版本包下载下来并重新安装<br>
@@ -689,7 +689,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
       &#123;
         <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;检查更新出错&quot;</span>,
       &#125;,
-      error
+      error,
     );
   &#125;);
 &#125;;
@@ -756,7 +756,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
   <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
 &#125;);</code></pre>
 <p>根据 autoUpdater 提供的监听将更新状态发送到渲染进程中显示出来<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20220802155551.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20220802155551.png" alt="" referrerPolicy="no-referrer"></p>
 <h4 id="增量更新">增量更新</h4>
 <p>有时候我们改动比较小不想全部下载下来重新安装，只想替换修改的部分，这时需要用到 electron 增量更新</p>
 <p>常用的增量更新有两种方案：</p>
@@ -781,7 +781,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
   <span class="hljs-keyword">if</span> (context.<span class="hljs-property">packager</span>.<span class="hljs-property">platform</span>.<span class="hljs-property">nodeName</span> === <span class="hljs-string">&quot;darwin&quot;</span>) &#123;
     targetPath = path.<span class="hljs-title function_">join</span>(
       context.<span class="hljs-property">appOutDir</span>,
-      <span class="hljs-string">`<span class="hljs-subst">$&#123;context.packager.appInfo.productName&#125;</span>.app/Contents/Resources`</span>
+      <span class="hljs-string">`<span class="hljs-subst">$&#123;context.packager.appInfo.productName&#125;</span>.app/Contents/Resources`</span>,
     );
   &#125; <span class="hljs-keyword">else</span> &#123;
     targetPath = path.<span class="hljs-title function_">join</span>(context.<span class="hljs-property">appOutDir</span>, <span class="hljs-string">&quot;./resources&quot;</span>);
@@ -807,7 +807,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
 
 <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = afterPack;</code></pre>
 <p>打包后我们可以看到生成了 app.zip<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20220803111249.png" alt="" referrerPolicy="no-referrer"><br>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20220803111249.png" alt="" referrerPolicy="no-referrer"><br>
 将这三个文件放到静态服务器上供下载更新</p>
 <h3 id="安装-sequelize-sqlite3-用作本地存储-可根据项目需要是否安装">安装 sequelize + sqlite3 用作本地存储(可根据项目需要是否安装)</h3>
 <pre><code class="hljs sh">yarn add sqlite3@5.0.2 sequelize@6.18.0</code></pre>
@@ -887,7 +887,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
     <span class="hljs-attr">sex</span>: <span class="hljs-number">1</span>,
     <span class="hljs-attr">id</span>: <span class="hljs-string">&quot;13456&quot;</span>,
     <span class="hljs-attr">mobile</span>: <span class="hljs-number">15219498643</span>,
-  &#125;)
+  &#125;),
 );
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res2);</code></pre>
 <h3 id="结束">结束</h3>
@@ -1198,7 +1198,7 @@ contextBridge.<span class="hljs-title function_">exposeInMainWorld</span>(<span 
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

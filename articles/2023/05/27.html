@@ -286,7 +286,7 @@
   <span class="hljs-attr">&quot;source.fixAll&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>
 <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span></code></pre>
 <p>用上面的配置可以在保存时自动排序 import 语句，而且能移除未用到的引用，可以解决当前问题。<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20230527151251.png" alt="" referrerPolicy="no-referrer"><br>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20230527151251.png" alt="" referrerPolicy="no-referrer"><br>
 但是我们发现 vscode 默认的 import 语句排序规则不友好</p>
 <p>外部模块的引用放在中间了，我们项目小伙伴对这样都不太习惯，因此想按照自己的习惯自定义排序，于是有了方法二</p>
 <p><strong>方法二：用方法一的配置再加上 <a target="_blank" rel="noopener" href="https://github.com/lydell/eslint-plugin-simple-import-sort">eslint-plugin-simple-import-sort</a>插件</strong></p>
@@ -309,7 +309,7 @@
   &#125;,
 &#125;;</code></pre>
 <p>配置好后重启 vscode 后，保存后可以发现 import 语句排序变了<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20230527153947.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20230527153947.png" alt="" referrerPolicy="no-referrer"></p>
 <p>这次 import 语句自动排序后基本达到我们的要求，并且排序规则也比较合适。</p>
 <p>优点： 配置简单 使用方便<br>
 缺点： 不支持更加详细的自定义排序</p>
@@ -372,7 +372,7 @@ I made this plugin for myself. I use it in many little projects and I like it.</
 <p>这个插件的配置就比较全面一点，在 import/order 中增加自己需要的排序规则,具体的排序规则可以参考<a target="_blank" rel="noopener" href="https://github.com/import-js/eslint-plugin-import/blob/HEAD/docs/rules/order.md#importorder">import/order</a></p>
 <p>上面的配置中也解释了各种排序规则的意义和作用</p>
 <p>因为我们是使用 Typescript,配置完后发现含有别名的路径不能被解析<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20230527162338.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20230527162338.png" alt="" referrerPolicy="no-referrer"></p>
 <p>查询资料后发现要增加<code>@typescript-eslint/parser</code>和 <code>eslint-import-resolver-typescript</code>插件和以下配置</p>
 <pre><code class="hljs js"><span class="hljs-variable language_">module</span>.<span class="hljs-property">export</span> = &#123;
   <span class="hljs-attr">extends</span>: [
@@ -683,7 +683,7 @@ I made this plugin for myself. I use it in many little projects and I like it.</
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

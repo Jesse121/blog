@@ -274,18 +274,18 @@
 <span id="more"></span>
 <h3 id="如何理解“跳表”？">如何理解“跳表”？</h3>
 <p>对于一个单链表来讲，即便链表中存储的数据是有序的，如果我们要想在其中查找某个数据，也只能从头到尾遍历链表。这样查找效率就会很低，时间复杂度会很高，是 O(n)。</p>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221123072042.png" alt="" referrerPolicy="no-referrer"></p>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221123072042.png" alt="" referrerPolicy="no-referrer"></p>
 <p>那怎么来提高查找效率呢？如果像图中那样，对链表建立一级“索引”，查找起来是不是就会更快一些呢？每两个结点提取一个结点到上一级，我们把抽出来的那一级叫做索引或索引层。加来一层索引之后，查找一个结点需要遍历的结点个数减少了，也就是说查找效率提高了。这种链表加多级索引的结构，就是跳表。</p>
 <h3 id="用跳表查询到底有多快？">用跳表查询到底有多快？</h3>
 <p>如果链表里有 n 个结点 按照我们刚才讲的，每两个结点会抽出一个结点作为上一级索引的结点，那第一级索引的结点个数大约就是 n/2，第二级索引的结点个数大约就是 n/4，第三级索引的结点个数大约就是 n/8，依次类推，也就是说，第 k 级索引的结点个数是第 k-1 级索引的结点个数的 1/2，那第 k 级索引结点的个数就是 n/(2<sup>k</sup>)。</p>
 <p>假设索引有 h 级，最高级的索引有 2 个结点。通过上面的公式，我们可以得到 n/(2<sup>h</sup>)=2，从而求得 h=log<sub>2</sub>n-1。如果包含原始链表这一层，整个跳表的高度就是 log<sub>2</sub>n。我们在跳表中查询某个数据的时候，如果每一层都要遍历 m 个结点，那在跳表中查询一个数据的时间复杂度就是 O(m*logn)。</p>
 <p>假设我们要查找的数据是 x，在第 k 级索引中，我们遍历到 y 结点之后，发现 x 大于 y，小于后面的结点 z，所以我们通过 y 的 down 指针，从第 k 级索引下降到第 k-1 级索引。在第 k-1 级索引中，y 和 z 之间只有 3 个结点（包含 y 和 z），所以，我们在 K-1 级索引中最多只需要遍历 3 个结点，依次类推，每一级索引都最多只需要遍历 3 个结点。<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221123072610.png" alt="" referrerPolicy="no-referrer"><br>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221123072610.png" alt="" referrerPolicy="no-referrer"><br>
 通过上面的分析，我们得到 m=3，所以<strong>在跳表中查询任意数据的时间复杂度就是 O(logn)。</strong></p>
 <h3 id="跳表是不是很浪费内存？">跳表是不是很浪费内存？</h3>
 <p>比起单纯的单链表，跳表需要存储多级索引，肯定要消耗更多的存储空间。</p>
 <p>假设原始链表大小为 n，那第一级索引大约有 n/2 个结点，第二级索引大约有 n/4 个结点，以此类推，每上升一级就减少一半，直到剩下 2 个结点。如果我们把每层索引的结点数写出来，就是一个等比数列。<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221123072815.png" alt="" referrerPolicy="no-referrer"><br>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221123072815.png" alt="" referrerPolicy="no-referrer"><br>
 这几级索引的结点总和就是 n/2+n/4+n/8…+8+4+2=n-2。所以，跳表的空间复杂度是 O(n)。</p>
 <h3 id="高效的动态插入和删除">高效的动态插入和删除</h3>
 <p>跳表这个动态数据结构，不仅支持查找操作，还支持动态的插入、删除操作，而且插入、删除操作的时间复杂度也是 O(logn)。</p>
@@ -714,7 +714,7 @@
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

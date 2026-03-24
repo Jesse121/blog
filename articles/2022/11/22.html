@@ -391,13 +391,13 @@ const modifyDate = function (date: Date, y: number, m: number, d: number) &#123;
     date.getHours(),
     date.getMinutes(),
     date.getSeconds(),
-    date.getMilliseconds()
+    date.getMilliseconds(),
   );
 &#125;;
 const changeYearMonthAndClampDate = function (
   date: Date,
   year: number,
-  month: number
+  month: number,
 ) &#123;
   const monthDate = Math.min(date.getDate(), getDayCountOfMonth(year, month));
   return modifyDate(date, year, month, monthDate);
@@ -460,7 +460,7 @@ const props = withDefaults(
      * 禁用日期
      */
     disabledDate: (val: Date) =&gt; false,
-  &#125;
+  &#125;,
 );
 
 const pickerVisible = ref(false);
@@ -502,7 +502,7 @@ watch(
   &#125;,
   &#123;
     immediate: true,
-  &#125;
+  &#125;,
 );
 
 const clearModelValue = () =&gt; &#123;
@@ -722,7 +722,7 @@ const disabledQuarter = (val: Date) =&gt; &#123;
 &#125;;
 &lt;/script&gt;</code></pre>
 <h3 id="效果图">效果图</h3>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221125090039.png" alt="" referrerPolicy="no-referrer"></p>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221125090039.png" alt="" referrerPolicy="no-referrer"></p>
 <p>功能点：</p>
 <ol>
 <li>支持切换年份</li>
@@ -1025,7 +1025,7 @@ const disabledQuarter = (val: Date) =&gt; &#123;
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

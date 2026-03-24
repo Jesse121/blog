@@ -329,7 +329,7 @@
 <span class="hljs-string">   height:100%;</span>
 <span class="hljs-string">   z-index:<span class="hljs-subst">$&#123;zIndex&#125;</span>;</span>
 <span class="hljs-string">   pointer-events:none;</span>
-<span class="hljs-string">   background-image:url(&#x27;<span class="hljs-subst">$&#123;base64Url&#125;</span>&#x27;)`</span> <span class="hljs-comment">// 默认平铺重复显示</span>
+<span class="hljs-string">   background-image:url(&#x27;<span class="hljs-subst">$&#123;base64Url&#125;</span>&#x27;)`</span>, <span class="hljs-comment">// 默认平铺重复显示</span>
   );
 
   container.<span class="hljs-property">style</span>.<span class="hljs-property">position</span> = <span class="hljs-string">&quot;relative&quot;</span>;
@@ -338,7 +338,7 @@
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> createWatermark;</code></pre>
 <p>最终效果<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20230618172535.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20230618172535.png" alt="" referrerPolicy="no-referrer"></p>
 <h3 id="svg-绘制水印">svg 绘制水印</h3>
 <pre><code class="hljs ts"><span class="hljs-keyword">interface</span> params &#123;
   container?: <span class="hljs-title class_">HTMLElement</span>;
@@ -372,15 +372,15 @@
 <span class="hljs-string">    stroke-opacity=&quot;<span class="hljs-subst">$&#123;opacity&#125;</span>&quot;</span>
 <span class="hljs-string">    fill=&quot;none&quot;</span>
 <span class="hljs-string">    transform=&quot;rotate(<span class="hljs-subst">$&#123;rotate&#125;</span>, <span class="hljs-subst">$&#123;<span class="hljs-built_in">parseFloat</span>(width) / <span class="hljs-number">2</span>&#125;</span>, <span class="hljs-subst">$&#123;</span></span>
-<span class="hljs-subst"><span class="hljs-string">    <span class="hljs-built_in">parseFloat</span>(height) / <span class="hljs-number">2</span></span></span>
-<span class="hljs-subst"><span class="hljs-string">  &#125;</span>)&quot;</span>
+<span class="hljs-subst"><span class="hljs-string">      <span class="hljs-built_in">parseFloat</span>(height) / <span class="hljs-number">2</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">    &#125;</span>)&quot;</span>
 <span class="hljs-string">    style=&quot;font-size: <span class="hljs-subst">$&#123;fontSize&#125;</span>;&quot;&gt;</span>
 <span class="hljs-string">    <span class="hljs-subst">$&#123;content&#125;</span></span>
 <span class="hljs-string">  &lt;/text&gt;</span>
 <span class="hljs-string">&lt;/svg&gt;`</span>;
   <span class="hljs-comment">// 利用window.btoa创建base64编码的字符串</span>
   <span class="hljs-keyword">const</span> base64Url = <span class="hljs-string">`data:image/svg+xml;base64,<span class="hljs-subst">$&#123;<span class="hljs-variable language_">window</span>.btoa(</span></span>
-<span class="hljs-subst"><span class="hljs-string">    <span class="hljs-built_in">unescape</span>(<span class="hljs-built_in">encodeURIComponent</span>(svgStr))</span></span>
+<span class="hljs-subst"><span class="hljs-string">    <span class="hljs-built_in">unescape</span>(<span class="hljs-built_in">encodeURIComponent</span>(svgStr)),</span></span>
 <span class="hljs-subst"><span class="hljs-string">  )&#125;</span>`</span>;
 
   <span class="hljs-keyword">const</span> watermark = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&quot;div&quot;</span>);
@@ -393,7 +393,7 @@
 <span class="hljs-string">   height:100%;</span>
 <span class="hljs-string">   z-index:<span class="hljs-subst">$&#123;zIndex&#125;</span>;</span>
 <span class="hljs-string">   pointer-events:none;</span>
-<span class="hljs-string">   background-image:url(&#x27;<span class="hljs-subst">$&#123;base64Url&#125;</span>&#x27;)`</span>
+<span class="hljs-string">   background-image:url(&#x27;<span class="hljs-subst">$&#123;base64Url&#125;</span>&#x27;)`</span>,
   );
 
   container.<span class="hljs-property">style</span>.<span class="hljs-property">position</span> = <span class="hljs-string">&quot;relative&quot;</span>;
@@ -776,7 +776,7 @@
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

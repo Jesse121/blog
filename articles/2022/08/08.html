@@ -273,7 +273,7 @@
        <p>electron 应用在增量更新时会从服务器下载更新包一般是 app.asar 或者 app.zip，然后解压更新包替换本地 app 文件夹。这里的服务器上下载文件如果是下载到 C 盘就会报错<br>
 <code>Error: EPERM: operation not permitted</code></p>
 <span id="more"></span>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20220805173352.png" alt="" referrerPolicy="no-referrer"><br>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20220805173352.png" alt="" referrerPolicy="no-referrer"><br>
 说明没有权限。<br>
 这里一般有两种方法解决：</p>
 <ol>
@@ -289,7 +289,7 @@
   <span class="hljs-comment">// ...</span>
 <span class="hljs-punctuation">&#125;</span></code></pre>
 <p>配置用管理员权限运行后发现在运行时会出现授权弹窗<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/IMG_2897.jpg" alt="IMG_2897" referrerPolicy="no-referrer"><br>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/IMG_2897.jpg" alt="IMG_2897" referrerPolicy="no-referrer"><br>
 只要点击是就可以正常运行，也能正常下载更新包到 C 盘。<br>
 运行后发现<strong>无法使用拖拽事件</strong>，这是因为 windows 规定：<a target="_blank" rel="noopener" href="https://social.technet.microsoft.com/forums/windows/zh-cn/cba0e9b1-25f8-40e5-a888-1435d604f68d/quotrun-as-administratorquot-prevents-drag-and-drop-working">当拖放源与目标运行的安全级别(隔离级别)不一致时，是禁止拖放的</a>。即，我们的 windows 资源管理器是以普通用户的身份运行的，而此时我们的应用程序是以管理员身份运行的，两个安全级别不一样，所以不能拖放了。<br>
 查询资料找了下解决办法都说不要用管理员权限运行，问题又回到了原点。</p>
@@ -331,7 +331,7 @@ sudo.<span class="hljs-title function_">exec</span>(
     &#125;
     log.<span class="hljs-title function_">info</span>(<span class="hljs-string">&quot;stdout&quot;</span>, stdout);
     log.<span class="hljs-title function_">info</span>(<span class="hljs-string">&quot;stderr&quot;</span>, stderr);
-  &#125;
+  &#125;,
 );</code></pre>
 <p>我们发现在解压完准备替换的时候有权限提升弹窗，我们选择是就可以替换了。<br>
 替换完 app 文件夹然后重启 electronApp 就可以达到更新的目的了。这样重启后不是用管理员权限运行也就不影响拖拽事件了。</p>
@@ -632,7 +632,7 @@ sudo.<span class="hljs-title function_">exec</span>(
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

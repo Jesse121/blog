@@ -274,7 +274,7 @@
 <span id="more"></span>
 <h3 id="O-logn-惊人的查找速度">O(logn) 惊人的查找速度</h3>
 <p>我们假设数据大小是 n，每次查找后数据都会缩小为原来的一半，也就是会除以 2。最坏情况下，直到查找区间被缩小为空，才停止。<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221118072702.png" alt="" referrerPolicy="no-referrer"><br>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221118072702.png" alt="" referrerPolicy="no-referrer"><br>
 可以看出来，这是一个等比数列。其中 n/2<sup>k</sup>=1 时，k 的值就是总共缩小的次数。而每一次缩小操作只涉及两个数据的大小比较，所以，经过了 k 次区间缩小操作，时间复杂度就是 O(k)。通过 n/2<sup>k</sup>=1，我们可以求得 k=log<sub>2</sub>n，所以时间复杂度就是 O(logn)。</p>
 <p>二分查找是我们目前为止遇到的第一个时间复杂度为 O(logn) 的算法。后面章节我们还会讲堆、二叉树的操作等等，它们的时间复杂度也是 O(logn)。我这里就再深入地讲讲 O(logn) 这种对数时间复杂度。这是一种极其高效的时间复杂度，有的时候甚至比时间复杂度是常量级 O(1) 的算法还要高效</p>
 <p>二分法查找容易出错的地方<br>
@@ -685,7 +685,7 @@
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

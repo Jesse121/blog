@@ -271,7 +271,7 @@
     </div>
     <div class="e-content article-entry" itemprop="articleBody">
        <p>最经典的、最常用的：冒泡排序、插入排序、选择排序、归并排序、快速排序、计数排序、基数排序、桶排序。<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221114074447.png" alt="排序" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221114074447.png" alt="排序" referrerPolicy="no-referrer"></p>
 <span id="more"></span>
 <h3 id="如何分析一个“排序算法”？">如何分析一个“排序算法”？</h3>
 <p><strong>排序算法的执行效率</strong></p>
@@ -373,7 +373,7 @@
   <span class="hljs-keyword">break</span>;
 &#125;</code></pre>
 <p>虽然冒泡排序和插入排序在时间复杂度上是一样的，都是 O(n<sup>2</sup>)，但是如果我们希望把性能优化做到极致，那肯定首选插入排序。</p>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221114203310.png" alt="" referrerPolicy="no-referrer"></p>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221114203310.png" alt="" referrerPolicy="no-referrer"></p>
 <p>这三种对于小规模数据的排序，用起来非常高效。但是在大规模数据排序的时候，这个时间复杂度还是稍微有点高，可以考虑使用归并排序和快速排序</p>
 <h3 id="归并排序（Merge-Sort）">归并排序（Merge Sort）</h3>
 <p>如果要排序一个数组，我们先把数组从中间分成前后两部分，然后对前后两部分分别排序，再将排好序的两部分合并在一起，这样整个数组就都有序了。</p>
@@ -389,7 +389,7 @@
   <span class="hljs-keyword">while</span> (orderLeft.<span class="hljs-property">length</span> || orderRight.<span class="hljs-property">length</span>) &#123;
     <span class="hljs-keyword">if</span> (orderLeft.<span class="hljs-property">length</span> &amp;&amp; orderRight.<span class="hljs-property">length</span>) &#123;
       res.<span class="hljs-title function_">push</span>(
-        orderLeft[<span class="hljs-number">0</span>] &lt; orderRight[<span class="hljs-number">0</span>] ? orderLeft.<span class="hljs-title function_">shift</span>() : orderRight.<span class="hljs-title function_">shift</span>()
+        orderLeft[<span class="hljs-number">0</span>] &lt; orderRight[<span class="hljs-number">0</span>] ? orderLeft.<span class="hljs-title function_">shift</span>() : orderRight.<span class="hljs-title function_">shift</span>(),
       );
     &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (orderLeft.<span class="hljs-property">length</span>) &#123;
       res.<span class="hljs-title function_">push</span>(orderLeft.<span class="hljs-title function_">shift</span>());
@@ -836,7 +836,7 @@ T(n) = 2*T(n/2) + n
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

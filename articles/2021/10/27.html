@@ -323,7 +323,7 @@
 <li>[^…]取反 不能是括号中的任意单个元素</li>
 </ul>
 <h4 id="总结">总结</h4>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221028203028.png" alt="正则元字符" referrerPolicy="no-referrer"></p>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221028203028.png" alt="正则元字符" referrerPolicy="no-referrer"></p>
 <h3 id="02-丨量词与贪婪：小小的正则，也可能把-CPU-拖垮！">02 丨量词与贪婪：小小的正则，也可能把 CPU 拖垮！</h3>
 <p>正则中的三种模式，贪婪匹配、非贪婪匹配和独占模式<br>
 贪婪模式，简单说就是尽可能进行最长匹配。非贪婪模式呢，则会尽可能进行最短匹配</p>
@@ -336,7 +336,7 @@
 <p>独占模式和贪婪模式很像，独占模式会尽可能多地去匹配，如果匹配失败就结束，不会进行回溯，这样的话就比较节省时间。具体的方法就是在量词后面加上加号（+）。</p>
 <h4 id="总结-2">总结</h4>
 <p>正则中量词默认是贪婪匹配，如果想要进行非贪婪匹配需要在量词后面加上问号。贪婪和非贪婪匹配都可能会进行回溯，独占模式也是进行贪婪匹配，但不进行回溯<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221028204851.png" alt="贪婪，非贪婪与独占模式" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221028204851.png" alt="贪婪，非贪婪与独占模式" referrerPolicy="no-referrer"></p>
 <h3 id="03-分组与引用：如何用正则实现更复杂的查找和替换操作？">03 | 分组与引用：如何用正则实现更复杂的查找和替换操作？</h3>
 <h4 id="分组与编号">分组与编号</h4>
 <p>括号在正则中可以用于分组，被括号括起来的部分“子表达式”会被保存成一个子组</p>
@@ -358,7 +358,7 @@
 <span class="hljs-comment">// Smith, John</span></code></pre>
 <h4 id="总结-3">总结</h4>
 <p>今天我们学习到了正则中的分组和子组编号相关内容。括号可以将某部分括起来，看成一个整体，也可以保存成一个子组，在后续查找替换的时候使用。分组编号是指，在正则中第几个括号内就是第几个分组，而嵌套括号我们只要看左括号是第几个就可以了。如果不想将括号里面的内容保存成子组，可以在括号里面加上?: 来解决。<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221028212204.png" alt="正则分组" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221028212204.png" alt="正则分组" referrerPolicy="no-referrer"></p>
 <h3 id="04-匹配模式：一次性掌握正则中常见的-4-种匹配模式">04 | 匹配模式：一次性掌握正则中常见的 4 种匹配模式</h3>
 <p>常见的匹配模式有 4 种，分别是不区分大小写模式、点号通配模式、多行模式和注释模式</p>
 <h4 id="不区分大小写模式（Case-Insensitive）">不区分大小写模式（Case-Insensitive）</h4>
@@ -391,7 +391,7 @@
 <li>多行匹配说的是 ^ 和 $ 的匹配行为，让其可以匹配上每行的开头或结尾。</li>
 <li>注释模式则可以在正则中添加注释，让正则变得更容易阅读和维护。</li>
 </ol>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221028214226.png" alt="匹配模式" referrerPolicy="no-referrer"></p>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221028214226.png" alt="匹配模式" referrerPolicy="no-referrer"></p>
 <h3 id="05-断言：如何用断言更好地实现替换重复出现的单词？">05 | 断言：如何用断言更好地实现替换重复出现的单词？</h3>
 <p>断言是指对匹配到的文本位置有要求<br>
 常见的断言有三种：单词边界、行的开始或结束以及环视</p>
@@ -442,7 +442,7 @@
 <p>今天我们学习了正则中断言相关的内容，最常见的断言有三种：单词的边界、行的开始或结束、环视。</p>
 <p>单词的边界是使用 \b 来表示，这个比较简单。而多行模式下，每一行的开始和结束是使用^ 和 $ 符号。如果想匹配整个字符串的开始或结束，可以使用 \A 和 \z，它们不受匹配模式的影响。</p>
 <p>最后就是环视，它又分为四种情况：肯定逆向环视、否定逆向环视、肯定顺序环视、否定顺序环视。在使用的时候记住一个方法：有左尖括号代表看左边，没有尖括号是看右边，而感叹号是非的意思。</p>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221028220716.png" alt="断言" referrerPolicy="no-referrer"></p>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221028220716.png" alt="断言" referrerPolicy="no-referrer"></p>
 <h3 id="06-转义：正则中转义需要注意哪些问题？">06 转义：正则中转义需要注意哪些问题？</h3>
 <p>转义序列通常有两种功能<br>
 第一种功能是编码无法用字母表直接表示的特殊数据。<br>
@@ -499,7 +499,7 @@
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
     <span class="hljs-string">`Found <span class="hljs-subst">$&#123;match[<span class="hljs-number">0</span>]&#125;</span> start=<span class="hljs-subst">$&#123;match.index&#125;</span> end=<span class="hljs-subst">$&#123;</span></span>
 <span class="hljs-subst"><span class="hljs-string">      match.index + match[<span class="hljs-number">0</span>].length</span></span>
-<span class="hljs-subst"><span class="hljs-string">    &#125;</span>.`</span>
+<span class="hljs-subst"><span class="hljs-string">    &#125;</span>.`</span>,
   );
 &#125;
 <span class="hljs-comment">// Found ^ start=0 end=1.</span>
@@ -508,7 +508,7 @@
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
     <span class="hljs-string">`Found <span class="hljs-subst">$&#123;match[<span class="hljs-number">0</span>]&#125;</span> start=<span class="hljs-subst">$&#123;match.index&#125;</span> end=<span class="hljs-subst">$&#123;</span></span>
 <span class="hljs-subst"><span class="hljs-string">      match.index + match[<span class="hljs-number">0</span>].length</span></span>
-<span class="hljs-subst"><span class="hljs-string">    &#125;</span>.`</span>
+<span class="hljs-subst"><span class="hljs-string">    &#125;</span>.`</span>,
   );
 &#125;
 <span class="hljs-comment">// Found ^ start=0 end=1.</span>
@@ -550,7 +550,7 @@
 <p>一般来说如果我们要想将元字符（.+?() 之类）表示成它字面上本来的意思，是需要对其进行转义的，但如果它们出现在字符组中括号里，可以不转义。这种情况，一般都是单个长度的元字符，比如点号（.）、星号（*）、加号（+）、问号（?）、左右圆括号等。它们都不再具有特殊含义，而是代表字符本身。但如果在中括号中出现 \d 或 \w 等符号时，他们还是元字符本身的含义</p>
 <h4 id="总结-6">总结</h4>
 <p>正则中转义有些情况下会比较复杂，从录入的字符串文本，到最终的正则表达式，经过了字符串转义和正则转义两个步骤。元字符的转义一般在前面加反斜杠就行，方括号和花括号的转义一般转义开括号就可以，但圆括号两个都需要转义，我们可以借助编程语言中的转义函数来实现转义。另外我们也讲了字符组中三种需要转义的情况，详细的可以参考下面的脑图<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221028075624.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221028075624.png" alt="" referrerPolicy="no-referrer"></p>
 <h3 id="07-正则有哪些常见的流派及其特性？">07 | 正则有哪些常见的流派及其特性？</h3>
 <p>目前正则表达式主要有两大流派（Flavor）：POSIX 流派与 PCRE 流派。</p>
 <h4 id="POSIX-流派">POSIX 流派</h4>
@@ -569,12 +569,12 @@
 <p>grep、sed、vi/vim 等属于 BRE 标准，egrep、awk 属于 ERE 标准。而 sed -P、grep -P 等属于 PCRE 流派。这些也不需要死记硬背，使用时用 man 命令看一下就好了。<br>
 如果你需要在类 Unix 平台命令等上使用正则，使用前需要搞清楚工具属于哪个标准，比如</p>
 <p><strong>GNU ERE 名称中有两个 E，不需要再转义。而 GNU BRE 只有一个 E，使用时“花圆问管加”时都要转义</strong><br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221029111235.png" alt="正则流派" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221029111235.png" alt="正则流派" referrerPolicy="no-referrer"></p>
 <h3 id="08-应用-1：正则如何处理-Unicode-编码的文本？">08 | 应用 1：正则如何处理 Unicode 编码的文本？</h3>
 <h4 id="编码问题的坑">编码问题的坑</h4>
 <p>如果你在编程语言中使用正则，编码问题可能会让正则的匹配行为很奇怪。先说结论，在使用时一定尽可能地使用 Unicode 编码。</p>
 <h4 id="总结-8">总结</h4>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221031072733.png" alt="" referrerPolicy="no-referrer"></p>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221031072733.png" alt="" referrerPolicy="no-referrer"></p>
 <h3 id="10-应用-3：如何在语言中用正则让文本处理能力上一个台阶？">10 | 应用 3：如何在语言中用正则让文本处理能力上一个台阶？</h3>
 <p>在进行文本处理时，正则解决的问题大概可以分成四类，分别是校验文本内容、提取文本内容、替换文本内容、切割文本内容</p>
 <h4 id="校验文本内容">校验文本内容</h4>
@@ -987,7 +987,7 @@ NFA 以表达式为主导，它的引擎是使用贪心匹配回溯算法实现<
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span

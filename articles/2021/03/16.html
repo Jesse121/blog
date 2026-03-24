@@ -283,7 +283,7 @@
 堆中的每个节点的值必须大于等于（或者小于等于）其子树中每个节点的值。实际上，我们还可以换一种说法，堆中每个节点的值都大于等于（或者小于等于）其左右子节点的值。这两种表述是等价的</p>
 <p>对于每个节点的值都大于等于子树中每个节点值的堆，我们叫做“大顶堆”。对于每个节点的值都小于等于子树中每个节点值的堆，我们叫做“小顶堆”。</p>
 <h3 id="如何实现一个堆？">如何实现一个堆？</h3>
-<p><img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221128075207.png" alt="" referrerPolicy="no-referrer"><br>
+<p><img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221128075207.png" alt="" referrerPolicy="no-referrer"><br>
 从图中我们可以看到，数组中下标为 i 的节点的左子节点，就是下标为 i∗2 的节点，右子节点就是下标为 i∗2+1 的节点，父节点就是下标为 2i​ 的节点。</p>
 <h4 id="往堆中插入一个元素-堆化（heapify）">往堆中插入一个元素 堆化（heapify）</h4>
 <p>我们可以让新插入的节点与父节点对比大小。如果不满足子节点小于等于父节点的大小关系，我们就互换两个节点。一直重复这个过程，直到父子节点之间满足刚说的那种大小关系。</p>
@@ -357,7 +357,7 @@
 <li>排序</li>
 </ol>
 <p>这个过程有点类似上面讲的“删除堆顶元素”的操作，当堆顶元素移除之后，我们把下标为 n 的元素放到堆顶，然后再通过堆化的方法，将剩下的 n−1 个元素重新构建成堆。堆化完成之后，我们再取堆顶的元素，放到下标是 n−1 的位置，一直重复这个过程，直到最后堆中只剩下标为 1 的一个元素，排序工作就完成了。<br>
-<img src="https://raw.githubusercontents.com/Jesse121/publicPic/master/blog/pictures/20221128212206.png" alt="" referrerPolicy="no-referrer"></p>
+<img src="https://raw.githubusercontent.com/Jesse121/publicPic/master/blog/pictures/20221128212206.png" alt="" referrerPolicy="no-referrer"></p>
 <p>整个堆排序的过程，都只需要极个别临时存储空间，所以堆排序是原地排序算法。堆排序包括建堆和排序两个操作，建堆过程的时间复杂度是 O(n)，排序过程的时间复杂度是 O(nlogn)，所以，堆排序整体的时间复杂度是 O(nlogn)。</p>
  
       <div id="toc-article">
@@ -650,7 +650,7 @@
       
       <p>
         <span
-          >Copyright &copy; 2023 Jesse.</span
+          >Copyright &copy; 2026 Jesse.</span
         >
         <span
           >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span
