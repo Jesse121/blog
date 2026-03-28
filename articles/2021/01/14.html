@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+   
+  <title>Vue3.0核心源码解读 | 生命周期：各个生命周期的执行时机和应用场景是怎样的？ | 前端之路</title>
+  <meta name="theme-color" content="#bccddd" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <meta name="description" content="专注前端开发，前端开发技术博客" />
+   
+  <meta name="keywords" content="Web前端开发，Javascript，前端开发博客" />
+  
+  <link rel="dns-prefetch" href="https://unpkg.com" />
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info" />
+   <link rel="alternate" href="/blog/atom.xml" title="前端之路" type="application/atom+xml">   <link rel="shortcut icon" href="/blog/favicon.ico"> 
+  <link rel="bookmark" href="/blog/favicon.ico" />
+  <link rel="apple-touch-icon" href="/blog/apple-touch-icon.png" />
+  <link rel="apple-touch-icon-precomposed" href="/blog/apple-touch-icon.png" />
+   
+<link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/xt256.min.css">
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+  
+<link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+    
+<link rel="stylesheet" href="https://unpkg.com/gitalk@1.7.2/dist/gitalk.css">
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">前端之路</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">路漫漫其修远兮，吾将上下而求索</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/blog/."><i class="fa fa-home"></i> 首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives/"><i class="fa fa-archive"></i> 归档</a>
+        
+          <a class="main-nav-link" href="/blog/about/"><i class="fa fa-user"></i> 关于</a>
+        
+      </nav>
+    </div>
+    <div id="search-form">
+      <div id="result-mask" class="hide"></div>
+      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
+      <div id="result-wrap" class="hide">
+        <div id="search-result"></div>
+      </div>
+      <div class="hide">
+        <template id="search-tpl">
+          <div class="item">
+            <a href="/{path}" title="{title}">
+              <div class="title">{title}</div>
+              <div class="time">{date}</div>
+              <div class="tags">{tags}</div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><style>
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    /* font-size: 0.91rem; */
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  pre code {
+    padding: 0 !important;
+    color: #e8eaf6;
+    background-color: #272822;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+  .line-numbers-rows {
+    border-right-width: 0px !important;
+  }
+
+  .line-numbers {
+    padding: 1.5rem 1.5rem 1.5rem 3.2rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre {
+    padding: 1.5rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre::before {
+    content: "";
+    height: 16px;
+    margin-bottom: 0;
+    display: block;
+  }
+
+  pre::after {
+    content: " ";
+    position: absolute;
+    border-radius: 50%;
+    background: #ff5f56;
+    width: 12px;
+    height: 12px;
+    top: 0;
+    left: 12px;
+    margin-top: 12px;
+    -webkit-box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+    box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+  }
+
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    font-size: 0.91rem;
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  .code_copy {
+    position: absolute;
+    top: 0.7rem;
+    right: 35px;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code_lang {
+    position: absolute;
+    top: 1.2rem;
+    right: 60px;
+    line-height: 0;
+    font-weight: bold;
+    font-family: normal;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code-expand {
+    position: absolute;
+    top: 4px;
+    right: 0px;
+    filter: invert(50%);
+    padding: 7px 10px;
+    z-index: 1;
+    cursor: pointer;
+    transition: all 0.3s;
+    transform: rotate(0deg);
+  }
+
+  .code-closed .code-expand {
+    transform: rotate(-180deg) !important;
+    transition: all 0.3s;
+  }
+
+  .code-closed pre::before {
+    height: 0px;
+  }
+
+  pre code {
+    padding: 0;
+    color: #e8eaf6;
+    background-color: #272822 !important;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+</style>
+<article
+  id="post-vue3/2021-01-14-vue3-core-source-code-10"
+  class="h-entry article article-type-post"
+  itemprop="blogPost"
+  itemscope
+  itemtype="https://schema.org/BlogPosting"
+>
+  <div class="article-inner">
+     
+    <header class="article-header">
+      
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Vue3.0核心源码解读 | 生命周期：各个生命周期的执行时机和应用场景是怎样的？
+    </h1>
+  
+
+
+    </header>
+    
+    <div class="article-meta">
+       <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2021-01-14T15:30:00.000Z" itemprop="datePublished">2021年01月14日</time>
+</span>   <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+  
+<a href="/blog/articles/2021/01/14.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+       <blockquote>
+<p>纸上得来终觉浅，绝知此事要躬行。</p>
+</blockquote>
+<p>Vue.js 组件的生命周期包括创建、更新、销毁等过程。在这些过程中也会运行叫生命周期钩子的函数，这给了用户在不同阶段添加自己的代码的机会。</p>
+<p>在 Vue.js 2.x 中，我们通常会在组件对象中定义一些生命周期钩子函数，到了 Vue.js 3.0，依然兼容 Vue.js 2.x 生命周期的语法，但是 Composition API 提供了一些生命周期函数的 API，让我们可以主动注册不同的生命周期。</p>
+<pre><code class="hljs javascript"><span class="hljs-comment">// Vue.js 2.x 定义生命周期钩子函数</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;
+  <span class="hljs-title function_">created</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-comment">// 做一些初始化工作</span>
+  &#125;,
+  <span class="hljs-title function_">mounted</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-comment">// 可以拿到 DOM 节点</span>
+  &#125;,
+  <span class="hljs-title function_">beforeDestroy</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-comment">// 做一些清理操作</span>
+  &#125;,
+&#125;;
+<span class="hljs-comment">//  Vue.js 3.x 生命周期 API 改写上例</span>
+<span class="hljs-keyword">import</span> &#123; onMounted, onBeforeUnmount &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;vue&quot;</span>;
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;
+  <span class="hljs-title function_">setup</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-comment">// 做一些初始化工作</span>
+
+    <span class="hljs-title function_">onMounted</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      <span class="hljs-comment">// 可以拿到 DOM 节点</span>
+    &#125;);
+    <span class="hljs-title function_">onBeforeUnmount</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      <span class="hljs-comment">// 做一些清理操作</span>
+    &#125;);
+  &#125;,
+&#125;;</code></pre>
+<p>可以看到，在 Vue.js 3.0 中，setup 函数已经替代了 Vue.js 2.x 的 beforeCreate 和 created 钩子函数，我们可以在 setup 函数做一些初始化工作，比如发送一个异步 Ajax 请求获取数据。</p>
+<p>我们用 onMounted API 替代了 Vue.js 2.x 的 mounted 钩子函数，用 onBeforeUnmount API 替代了 Vue.js 2.x 的 beforeDestroy 钩子函数。</p>
+<p>其实，Vue.js 3.0 针对 Vue.js 2.x 的生命周期钩子函数做了全面替换，映射关系如下：</p>
+<pre><code class="hljs javascript">beforeCreate -&gt; 使用 <span class="hljs-title function_">setup</span>()
+created -&gt; 使用 use <span class="hljs-title function_">setup</span>()
+beforeMount -&gt; onBeforeMount
+mounted -&gt; onMounted
+beforeUpdate -&gt; onBeforeUpdate
+updated -&gt; onUpdated
+beforeDestroy-&gt; onBeforeUnmount
+destroyed -&gt; onUnmounted
+activated -&gt; onActivated
+deactivated -&gt; onDeactivated
+errorCaptured -&gt; onErrorCaptured</code></pre>
+<p>除此之外，Vue.js 3.0 还新增了两个用于调试的生命周期 API：onRenderTracked 和 onRenderTriggered。</p>
+<p>那么，这些生命周期钩子函数内部是如何实现的？它们又分别在组件生命周期的哪些阶段执行的？分别适用于哪些开发场景？</p>
+<p>带着这些疑问，我们来深入学习生命周期钩子函数背后的实现原理。</p>
+<h2 id="1-注册钩子函数">1 注册钩子函数</h2>
+<p>首先，我们来看这些钩子函数是如何注册的，先来看一下它们的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> onBeforeMount = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;bm&quot;</span> <span class="hljs-comment">/* BEFORE_MOUNT */</span>);
+<span class="hljs-keyword">const</span> onMounted = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;m&quot;</span> <span class="hljs-comment">/* MOUNTED */</span>);
+<span class="hljs-keyword">const</span> onBeforeUpdate = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;bu&quot;</span> <span class="hljs-comment">/* BEFORE_UPDATE */</span>);
+<span class="hljs-keyword">const</span> onUpdated = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;u&quot;</span> <span class="hljs-comment">/* UPDATED */</span>);
+<span class="hljs-keyword">const</span> onBeforeUnmount = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;bum&quot;</span> <span class="hljs-comment">/* BEFORE_UNMOUNT */</span>);
+<span class="hljs-keyword">const</span> onUnmounted = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;um&quot;</span> <span class="hljs-comment">/* UNMOUNTED */</span>);
+<span class="hljs-keyword">const</span> onRenderTriggered = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;rtg&quot;</span> <span class="hljs-comment">/* RENDER_TRIGGERED */</span>);
+<span class="hljs-keyword">const</span> onRenderTracked = <span class="hljs-title function_">createHook</span>(<span class="hljs-string">&quot;rtc&quot;</span> <span class="hljs-comment">/* RENDER_TRACKED */</span>);
+<span class="hljs-keyword">const</span> <span class="hljs-title function_">onErrorCaptured</span> = (<span class="hljs-params">hook, target = currentInstance</span>) =&gt; &#123;
+  <span class="hljs-title function_">injectHook</span>(<span class="hljs-string">&quot;ec&quot;</span> <span class="hljs-comment">/* ERROR_CAPTURED */</span>, hook, target);
+&#125;;</code></pre>
+<p>我们发现除了 onErrorCaptured，其他钩子函数都是通过 createHook 函数创建的，通过传入不同的字符串来表示不同的钩子函数。</p>
+<p>那么，我们就来分析一下 createHook 钩子函数的实现原理：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> createHook = <span class="hljs-keyword">function</span> (<span class="hljs-params">lifecycle</span>) &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">function</span> (<span class="hljs-params">hook, target = currentInstance</span>) &#123;
+    <span class="hljs-title function_">injectHook</span>(lifecycle, hook, target);
+  &#125;;
+&#125;;</code></pre>
+<p>createHook 会返回一个函数，它的内部通过 injectHook 注册钩子函数。你可能会问，这里为什么要用 createHook 做一层封装而不直接使用 injectHook API 呢？比如：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> onBeforeMount = <span class="hljs-keyword">function</span> (<span class="hljs-params">hook, target = currentInstance</span>) &#123;
+  <span class="hljs-title function_">injectHook</span>(<span class="hljs-string">&quot;bm&quot;</span>, hook, target);
+&#125;;
+<span class="hljs-keyword">const</span> onMounted = <span class="hljs-keyword">function</span> (<span class="hljs-params">hook, target = currentInstance</span>) &#123;
+  <span class="hljs-title function_">injectHook</span>(<span class="hljs-string">&quot;m&quot;</span>, hook, target);
+&#125;;</code></pre>
+<p>这样实现当然也是可以的，不过，我们可以发现，这些钩子函数内部执行逻辑很类似，都是执行 injectHook，唯一的区别是第一个参数字符串不同，所以这样的代码是可以进一步封装的，即用 createHook 封装，这就是一个典型的函数柯里化技巧。</p>
+<p>在调用 createHook 返回的函数时，也就不需要传入 lifecycle 字符串，因为它在执行 createHook 函数时就已经实现了该参数的保留。</p>
+<p>所以，当我们通过 onMounted(hook) 注册一个钩子函数时，内部就是通过 injectHook(‘m’, hook) 去注册的，接下来我们来进一步看 injectHook 函数的实现原理：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">injectHook</span>(<span class="hljs-params">type, hook, target = currentInstance, prepend = <span class="hljs-literal">false</span></span>) &#123;
+  <span class="hljs-keyword">const</span> hooks = target[type] || (target[type] = []);
+  <span class="hljs-comment">// 封装 hook 钩子函数并缓存</span>
+  <span class="hljs-keyword">const</span> wrappedHook =
+    hook.<span class="hljs-property">__weh</span> ||
+    (hook.<span class="hljs-property">__weh</span> = <span class="hljs-function">(<span class="hljs-params">...args</span>) =&gt;</span> &#123;
+      <span class="hljs-keyword">if</span> (target.<span class="hljs-property">isUnmounted</span>) &#123;
+        <span class="hljs-keyword">return</span>;
+      &#125;
+      <span class="hljs-comment">// 停止依赖收集</span>
+      <span class="hljs-title function_">pauseTracking</span>();
+      <span class="hljs-comment">// 设置 target 为当前运行的组件实例</span>
+      <span class="hljs-title function_">setCurrentInstance</span>(target);
+      <span class="hljs-comment">// 执行钩子函数</span>
+      <span class="hljs-keyword">const</span> res = <span class="hljs-title function_">callWithAsyncErrorHandling</span>(hook, target, type, args);
+      <span class="hljs-title function_">setCurrentInstance</span>(<span class="hljs-literal">null</span>);
+      <span class="hljs-comment">// 恢复依赖收集</span>
+      <span class="hljs-title function_">resetTracking</span>();
+      <span class="hljs-keyword">return</span> res;
+    &#125;);
+  <span class="hljs-keyword">if</span> (prepend) &#123;
+    hooks.<span class="hljs-title function_">unshift</span>(wrappedHook);
+  &#125; <span class="hljs-keyword">else</span> &#123;
+    hooks.<span class="hljs-title function_">push</span>(wrappedHook);
+  &#125;
+&#125;</code></pre>
+<p>结合代码来看，该函数主要是对用户注册的钩子函数 hook 做了一层封装，然后添加到一个数组中，把数组保存在当前组件实例的 target 上，这里，key 是用来区分钩子函数的字符串。比如， onMounted 注册的钩子函数在组件实例上就是通过 instance.m 来保存。</p>
+<p>这样的设计其实非常好理解，因为生命周期的钩子函数，是在组件生命周期的各个阶段执行，所以钩子函数必须要保存在当前的组件实例上，这样后面就可以在组件实例上通过不同的字符串 key 找到对应的钩子函数数组并执行。</p>
+<p>对于相同的钩子函数，会把封装的 wrappedHook 钩子函数缓存到 hook.__weh 中，这样后续通过 scheduler 方式执行的钩子函数就会被去重。</p>
+<p>在后续执行 wrappedHook 函数时，会先停止依赖收集，因为钩子函数内部访问的响应式对象，通常都已经执行过依赖收集，所以钩子函数执行的时候没有必要再次收集依赖，毕竟这个过程也有一定的性能消耗。</p>
+<p>接着是设置 target 为当前组件实例。在 Vue.js 的内部，会一直维护当前运行的组件实例 currentInstance，在注册钩子函数的过程中，我们可以拿到当前运行组件实例 currentInstance，并用 target 保存，然后在钩子函数执行时，为了确保此时的 currentInstance 和注册钩子函数时一致，会通过 <code>setCurrentInstance(target)</code> 设置 target 为当前组件实例。</p>
+<p>接下来就是通过 callWithAsyncErrorHandling 方法去执行我们注册的 hook 钩子函数，函数执行完毕则设置当前运行组件实例为 null，并恢复依赖收集。</p>
+<p>到这里，我们就了解了生命周期钩子函数是如何注册以及如何执行的，接下来，我们来依次分析各个钩子函数的执行时机和应用场景。</p>
+<p>首先，我们来看通过 onBeforeMount 和 onMounted 注册的钩子函数。</p>
+<h2 id="2-onBeforeMount-和-onMounted">2 onBeforeMount 和 onMounted</h2>
+<p><strong>onBeforeMount 注册的 beforeMount 钩子函数会在组件挂载之前执行，onMounted 注册的 mounted 钩子函数会在组件挂载之后执行</strong>。我们来回顾一下组件副作用渲染函数关于组件挂载部分的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">setupRenderEffect</span> = (<span class="hljs-params"></span>
+<span class="hljs-params">  instance,</span>
+<span class="hljs-params">  initialVNode,</span>
+<span class="hljs-params">  container,</span>
+<span class="hljs-params">  anchor,</span>
+<span class="hljs-params">  parentSuspense,</span>
+<span class="hljs-params">  isSVG,</span>
+<span class="hljs-params">  optimized</span>
+<span class="hljs-params"></span>) =&gt; &#123;
+  <span class="hljs-comment">// 创建响应式的副作用渲染函数</span>
+  instance.<span class="hljs-property">update</span> = <span class="hljs-title function_">effect</span>(<span class="hljs-keyword">function</span> <span class="hljs-title function_">componentEffect</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-keyword">if</span> (!instance.<span class="hljs-property">isMounted</span>) &#123;
+      <span class="hljs-comment">// 获取组件实例上通过 onBeforeMount 钩子函数和 onMounted 注册的钩子函数</span>
+      <span class="hljs-keyword">const</span> &#123; bm, m &#125; = instance;
+      <span class="hljs-comment">// 渲染组件生成子树 vnode</span>
+      <span class="hljs-keyword">const</span> subTree = (instance.<span class="hljs-property">subTree</span> = <span class="hljs-title function_">renderComponentRoot</span>(instance));
+      <span class="hljs-comment">// 执行 beforemount 钩子函数</span>
+      <span class="hljs-keyword">if</span> (bm) &#123;
+        <span class="hljs-title function_">invokeArrayFns</span>(bm);
+      &#125;
+      <span class="hljs-comment">// 把子树 vnode 挂载到 container 中</span>
+      <span class="hljs-title function_">patch</span>(<span class="hljs-literal">null</span>, subTree, container, anchor, instance, parentSuspense, isSVG);
+      <span class="hljs-comment">// 保留渲染生成的子树根 DOM 节点</span>
+      initialVNode.<span class="hljs-property">el</span> = subTree.<span class="hljs-property">el</span>;
+      <span class="hljs-comment">// 执行 mounted 钩子函数</span>
+      <span class="hljs-keyword">if</span> (m) &#123;
+        <span class="hljs-title function_">queuePostRenderEffect</span>(m, parentSuspense);
+      &#125;
+      instance.<span class="hljs-property">isMounted</span> = <span class="hljs-literal">true</span>;
+    &#125; <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-comment">// 更新组件</span>
+    &#125;
+  &#125;, prodEffectOptions);
+&#125;;</code></pre>
+<p>在执行 patch 挂载组件之前，会检测组件实例上是有否有注册的 beforeMount 钩子函数 bm，如果有则通过 invokeArrayFns 执行它，因为用户可以通过多次执行 onBeforeMount 函数注册多个 beforeMount 钩子函数，所以这里 <a target="_blank" rel="noopener" href="http://instance.bm">instance.bm</a> 是一个数组，通过遍历这个数组来依次执行 beforeMount 钩子函数。</p>
+<p>在执行 patch 挂载组件之后，会检查组件实例上是否有注册的 mounted 钩子函数 m，如果有的话则执行 queuePostRenderEffect，把 mounted 钩子函数推入 postFlushCbs 中，然后在整个应用 render 完毕后，同步执行 flushPostFlushCbs 函数调用 mounted 钩子函数。</p>
+<p>我经常在社区里听到一种争论：在组件初始化阶段，对于发送一些 Ajax 异步请求的逻辑，是应该放在 created 钩子函数中，还是应该放在 mounted 钩子函数中？</p>
+<p>其实都可以，因为 created 和 mounted 钩子函数执行的时候都能拿到组件数据，它们执行的顺序虽然有先后，但都会在一个 Tick 内执行完毕，而异步请求是有网络耗时的，其耗时远远大于一个 Tick 的时间。所以，你无论在 created 还是在 mounted 里发请求，都要等请求的响应回来，然后更新数据，再触发组件的重新渲染。</p>
+<p>前面说过，Vue.js 2.x 中的 beforeCreate 和 created 钩子函数可以用 setup 函数替代。所以，对于组件初始化阶段发送异步请求的逻辑，放在 setup 函数中、beforeMount 钩子函数中或者 mounted 钩子函数中都可以，它们都可以拿到组件相关的数据。当然，我更推荐在 setup 函数中执行，因为从语义化的角度来看这样更合适。</p>
+<p>不过，如果你想依赖 DOM 去做一些初始化操作，那就只能把相关逻辑放在 mounted 钩子函数中了，这样你才能拿到组件渲染后的 DOM。</p>
+<p>对于嵌套组件，组件在挂载相关的生命周期钩子函数时，先执行父组件的 beforeMount，然后是子组件的 beforeMount，接着是子组件的 mounted ，最后执行父组件的 mounted。</p>
+<p>接下来，我们来看通过 onBeforeUpdate 和 onUpdated 注册的钩子函数。</p>
+<h2 id="3-onBeforeUpdate-和-onUpdated">3 onBeforeUpdate 和 onUpdated</h2>
+<p><strong>onBeforeUpdate 注册的 beforeUpdate 钩子函数会在组件更新之前执行，onUpdated 注册的 updated 钩子函数会在组件更新之后执行</strong>。我们来回顾一下组件副作用渲染函数关于组件更新的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">setupRenderEffect</span> = (<span class="hljs-params"></span>
+<span class="hljs-params">  instance,</span>
+<span class="hljs-params">  initialVNode,</span>
+<span class="hljs-params">  container,</span>
+<span class="hljs-params">  anchor,</span>
+<span class="hljs-params">  parentSuspense,</span>
+<span class="hljs-params">  isSVG,</span>
+<span class="hljs-params">  optimized</span>
+<span class="hljs-params"></span>) =&gt; &#123;
+  <span class="hljs-comment">// 创建响应式的副作用渲染函数</span>
+  instance.<span class="hljs-property">update</span> = <span class="hljs-title function_">effect</span>(<span class="hljs-keyword">function</span> <span class="hljs-title function_">componentEffect</span>(<span class="hljs-params"></span>) &#123;
+    <span class="hljs-keyword">if</span> (!instance.<span class="hljs-property">isMounted</span>) &#123;
+      <span class="hljs-comment">// 渲染组件</span>
+    &#125; <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-comment">// 更新组件</span>
+      <span class="hljs-comment">// 获取组件实例上通过 onBeforeUpdate 钩子函数和 onUpdated 注册的钩子函数</span>
+      <span class="hljs-keyword">let</span> &#123; next, vnode, bu, u &#125; = instance;
+      <span class="hljs-comment">// next 表示新的组件 vnode</span>
+      <span class="hljs-keyword">if</span> (next) &#123;
+        <span class="hljs-comment">// 更新组件 vnode 节点信息</span>
+        <span class="hljs-title function_">updateComponentPreRender</span>(instance, next, optimized);
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        next = vnode;
+      &#125;
+      <span class="hljs-comment">// 渲染新的子树 vnode</span>
+      <span class="hljs-keyword">const</span> nextTree = <span class="hljs-title function_">renderComponentRoot</span>(instance);
+      <span class="hljs-comment">// 缓存旧的子树 vnode</span>
+      <span class="hljs-keyword">const</span> prevTree = instance.<span class="hljs-property">subTree</span>;
+      <span class="hljs-comment">// 更新子树 vnode</span>
+      instance.<span class="hljs-property">subTree</span> = nextTree;
+      <span class="hljs-comment">// 执行 beforeUpdate 钩子函数</span>
+      <span class="hljs-keyword">if</span> (bu) &#123;
+        <span class="hljs-title function_">invokeArrayFns</span>(bu);
+      &#125;
+      <span class="hljs-comment">// 组件更新核心逻辑，根据新旧子树 vnode 做 patch</span>
+      <span class="hljs-title function_">patch</span>(
+        prevTree,
+        nextTree,
+        <span class="hljs-comment">// 如果在 teleport 组件中父节点可能已经改变，所以容器直接找旧树 DOM 元素的父节点</span>
+        <span class="hljs-title function_">hostParentNode</span>(prevTree.<span class="hljs-property">el</span>),
+        <span class="hljs-comment">// 缓存更新后的 DOM 节点</span>
+        <span class="hljs-title function_">getNextHostNode</span>(prevTree),
+        instance,
+        parentSuspense,
+        isSVG
+      );
+      <span class="hljs-comment">// 缓存更新后的 DOM 节点</span>
+      next.<span class="hljs-property">el</span> = nextTree.<span class="hljs-property">el</span>;
+      <span class="hljs-comment">// 执行 updated 钩子函数</span>
+      <span class="hljs-keyword">if</span> (u) &#123;
+        <span class="hljs-title function_">queuePostRenderEffect</span>(u, parentSuspense);
+      &#125;
+    &#125;
+  &#125;, prodEffectOptions);
+&#125;;</code></pre>
+<p>在执行 patch 更新组件之前，会检测组件实例上是有否有注册的 beforeUpdate 钩子函数 bu，如果有则通过 invokeArrayFns 执行它。</p>
+<p>在执行 patch 更新组件之后，会检查组件实例上是否有注册的 updated 钩子函数 u，如果有，则通过 queuePostRenderEffect 把 updated 钩子函数推入 postFlushCbs 中，因为组件的更新本身就是在 nextTick 后进行 flushJobs，因此此时再次执行 queuePostRenderEffect 推入到队列的任务，会在同一个 Tick 内执行这些 postFlushCbs，也就是执行所有 updated 的钩子函数。</p>
+<p>在 beforeUpdate 钩子函数执行时，组件的 DOM 还未更新，如果你想在组件更新前访问 DOM，比如手动移除已添加的事件监听器，你可以注册这个钩子函数。</p>
+<p>在 updated 钩子函数执行时，组件 DOM 已经更新，所以你现在可以执行依赖于 DOM 的操作。如果要监听数据的改变并执行某些逻辑，最好不要使用 updated 钩子函数而用计算属性或 watcher 取而代之，因为任何数据的变化导致的组件更新都会执行 updated 钩子函数。另外注意， **不要在 updated 钩子函数中更改数据，因为这样会再次触发组件更新，导致无限递归更新 **。</p>
+<p>还有，父组件的更新不一定会导致子组件的更新，因为 Vue.js 的更新粒度是组件级别的。</p>
+<p>接下来，我们来看通过 onBeforeUnmount 和 onUnmounted 注册的钩子函数。</p>
+<h2 id="4-onBeforeUnmount-和-onUnmounted">4 onBeforeUnmount 和 onUnmounted</h2>
+<p><strong>onBeforeUnmount 注册的 beforeUnMount 钩子函数会在组件销毁之前执行，onUnmounted 注册的 unmounted 钩子函数会在组件销毁之后执行</strong> 。我们来看一下组件销毁相关逻辑实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">unmountComponent</span> = (<span class="hljs-params">instance, parentSuspense, doRemove</span>) =&gt; &#123;
+  <span class="hljs-keyword">const</span> &#123; bum, effects, update, subTree, um &#125; = instance;
+  <span class="hljs-comment">// 执行 beforeUnmount 钩子函数</span>
+  <span class="hljs-keyword">if</span> (bum) &#123;
+    <span class="hljs-title function_">invokeArrayFns</span>(bum);
+  &#125;
+  <span class="hljs-comment">// 清理组件引用的 effects 副作用函数</span>
+  <span class="hljs-keyword">if</span> (effects) &#123;
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; effects.<span class="hljs-property">length</span>; i++) &#123;
+      <span class="hljs-title function_">stop</span>(effects[i]);
+    &#125;
+  &#125;
+  <span class="hljs-comment">// 如果一个异步组件在加载前就销毁了，则不会注册副作用渲染函数</span>
+  <span class="hljs-keyword">if</span> (update) &#123;
+    <span class="hljs-title function_">stop</span>(update);
+    <span class="hljs-comment">// 调用 unmount 销毁子树</span>
+    <span class="hljs-title function_">unmount</span>(subTree, instance, parentSuspense, doRemove);
+  &#125;
+  <span class="hljs-comment">// 执行 unmounted 钩子函数</span>
+  <span class="hljs-keyword">if</span> (um) &#123;
+    <span class="hljs-title function_">queuePostRenderEffect</span>(um, parentSuspense);
+  &#125;
+&#125;;</code></pre>
+<p>其实整个组件销毁的逻辑很简单，主要就是<strong>清理组件实例上绑定的 effects 副作用函数和注册的副作用渲染函数 update，<strong>以及</strong>调用 unmount 销毁子树</strong>。</p>
+<p>unmount 主要就是遍历子树，它会通过递归的方式来销毁子节点，遇到组件节点时执行 unmountComponent，遇到普通节点时则删除 DOM 元素。组件的销毁过程和渲染过程类似，都是递归的过程。</p>
+<p>在组件销毁前，会检测组件实例上是有否有注册的 beforeUnmount 钩子函数 bum，如果有则通过 invokeArrayFns 执行。</p>
+<p>在组件销毁后，会检测组件实例上是否有注册的 unmounted 钩子函数 um，如果有则通过 queuePostRenderEffect 把 unmounted 钩子函数推入到 postFlushCbs 中，因为组件的销毁就是组件更新的一个分支逻辑，所以在 nextTick 后进行 flushJobs，因此此时再次执行 queuePostRenderEffect 推入队列的任务，会在同一个 Tick 内执行这些 postFlushCbs，也就是执行所有的 unmounted 钩子函数。</p>
+<p>对于嵌套组件，组件在执行销毁相关的生命周期钩子函数时，先执行父组件的 beforeUnmount，再执行子组件的 beforeUnmount，然后执行子组件的 unmounted ，最后执行父组件的 unmounted。</p>
+<p>虽然组件在销毁阶段会清理一些定义的 effects 函数，删除组件内部的 DOM 元素，但是有一些需要清理的对象，组件并不能自动完成它们的清理，比如你在组件内部创建一个定时器，就应该在 beforeUnmount 或者 unmounted 钩子函数中清除，举个例子：</p>
+<pre><code class="hljs javascript">&lt;template&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span></span>
+<span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span></span>
+<span class="language-xml">      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>&#123;&#123;count&#125;&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+<span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+&lt;/template&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"></span></span>
+<span class="language-javascript"><span class="language-xml">  <span class="hljs-keyword">import</span> &#123; ref, onBeforeUnmount &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span></span></span>
+<span class="language-javascript"><span class="language-xml">  <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">    setup () &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-keyword">const</span> count = <span class="hljs-title function_">ref</span>(<span class="hljs-number">0</span>)</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-keyword">const</span> timer = <span class="hljs-built_in">setInterval</span>(<span class="hljs-function">() =&gt;</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(count.<span class="hljs-property">value</span>++)</span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;, <span class="hljs-number">1000</span>)</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-title function_">onBeforeUnmount</span>(<span class="hljs-function">() =&gt;</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        <span class="hljs-built_in">clearInterval</span>(timer)</span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;)</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-keyword">return</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        count</span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;</span></span>
+<span class="language-javascript"><span class="language-xml">    &#125;</span></span>
+<span class="language-javascript"><span class="language-xml">  &#125;</span></span>
+<span class="language-javascript"><span class="language-xml"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span></code></pre>
+<p>可以看到，这里我们在 setup 函数内部定义了一个 timer 计时器， count 每秒会加 1 并在控制台中输出。如果这个组件被销毁，就会触发 onBeforeUnmount 注册的 beforeUnmount 钩子函数，然后清除定时器。如果你不清除，就会发现组件销毁后，虽然 DOM 被移除了，计时器仍然存在，并且会一直计时并在控制台输出，这就造成了不必要的内存泄漏。</p>
+<p>接下来，我们来看通过 onErrorCaptured 注册的钩子函数。</p>
+<h2 id="5-onErrorCaptured">5 onErrorCaptured</h2>
+<p>在前面的课时中，我们多次接触过一个方法 callWithErrorHandling，它就是执行一段函数并通过 handleError 处理错误。那么，handleError 具体做了哪些事情呢？</p>
+<p>我们先来看一下它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">handleError</span>(<span class="hljs-params">err, instance, type</span>) &#123;
+  <span class="hljs-keyword">const</span> contextVNode = instance ? instance.<span class="hljs-property">vnode</span> : <span class="hljs-literal">null</span>;
+  <span class="hljs-keyword">if</span> (instance) &#123;
+    <span class="hljs-keyword">let</span> cur = instance.<span class="hljs-property">parent</span>;
+    <span class="hljs-comment">// 为了兼容 2.x 版本，暴露组件实例给钩子函数</span>
+    <span class="hljs-keyword">const</span> exposedInstance = instance.<span class="hljs-property">proxy</span>;
+    <span class="hljs-comment">// 获取错误信息</span>
+    <span class="hljs-keyword">const</span> errorInfo =
+      process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> !== <span class="hljs-string">&quot;production&quot;</span> ? <span class="hljs-title class_">ErrorTypeStrings</span>[type] : type;
+    <span class="hljs-comment">// 尝试向上查找所有父组件，执行 errorCaptured 钩子函数</span>
+    <span class="hljs-keyword">while</span> (cur) &#123;
+      <span class="hljs-keyword">const</span> errorCapturedHooks = cur.<span class="hljs-property">ec</span>;
+      <span class="hljs-keyword">if</span> (errorCapturedHooks) &#123;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; errorCapturedHooks.<span class="hljs-property">length</span>; i++) &#123;
+          <span class="hljs-comment">// 如果执行的 errorCaptured 钩子函数并返回 true，则停止向上查找。、</span>
+          <span class="hljs-keyword">if</span> (errorCapturedHooks[i](err, exposedInstance, errorInfo)) &#123;
+            <span class="hljs-keyword">return</span>;
+          &#125;
+        &#125;
+      &#125;
+      cur = cur.<span class="hljs-property">parent</span>;
+    &#125;
+  &#125;
+  <span class="hljs-comment">// 往控制台输出未处理的错误</span>
+  <span class="hljs-title function_">logError</span>(err, type, contextVNode);
+&#125;</code></pre>
+<p>handleError 的实现其实很简单，它会从当前报错的组件的父组件实例开始，尝试去查找注册的 errorCaptured 钩子函数，如果有则遍历执行并且判断 errorCaptured 钩子函数的返回值是否为 true，如果是则说明这个错误已经得到了正确的处理，就会直接结束。</p>
+<p>否则会继续遍历，遍历完当前组件实例的 errorCaptured 钩子函数后，如果这个错误还没得到正确处理，则向上查找它的父组件实例，以同样的逻辑去查找是否有正确处理该错误的 errorCaptured 钩子函数，直到查找完毕。</p>
+<p>如果整个链路上都没有正确处理错误的 errorCaptured 钩子函数，则通过 logError 往控制台输出未处理的错误。所以 <strong>errorCaptured 本质上是捕获一个来自子孙组件的错误，它返回 true 就可以阻止错误继续向上传播</strong>。</p>
+<p>errorCaptured 在平时工作中可能用的不多，但它的确是一个很实用的功能，比如你可以在根组件注册一个 errorCaptured 钩子函数，去捕获所有子孙组件的错误，并且可以根据错误的类型和信息统计和上报错误。</p>
+<p>接下来，我们来看通过 onRenderTracked 和 onRenderTriggered 注册的钩子函数。</p>
+<h2 id="6-onRenderTracked-和-onRenderTriggered">6 onRenderTracked 和 onRenderTriggered</h2>
+<p>onRenderTracked 和 onRenderTriggered 是 Vue.js 3.0 新增的生命周期 API，它们是在开发阶段渲染调试用的。这里再次回顾一下我们创建的副作用渲染函数的第二个参数（这里你可以去 “ 响应式：响应式内部的实现原理是怎样的？ ”这篇文章中回顾一下），在开发环境下它的代码是这样的：</p>
+<pre><code class="hljs javascript">instance.<span class="hljs-property">update</span> = <span class="hljs-title function_">effect</span>(<span class="hljs-keyword">function</span> <span class="hljs-title function_">componentEffect</span>(<span class="hljs-params"></span>) &#123;
+  <span class="hljs-comment">// 创建或者更组件</span>
+&#125;, <span class="hljs-title function_">createDevEffectOptions</span>(instance));
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">createDevEffectOptions</span>(<span class="hljs-params">instance</span>) &#123;
+  <span class="hljs-keyword">return</span> &#123;
+    <span class="hljs-attr">scheduler</span>: queueJob,
+    <span class="hljs-attr">onTrack</span>: instance.<span class="hljs-property">rtc</span> ? <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> <span class="hljs-title function_">invokeArrayFns</span>(instance.<span class="hljs-property">rtc</span>, e) : <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>,
+    <span class="hljs-attr">onTrigger</span>: instance.<span class="hljs-property">rtg</span> ? <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> <span class="hljs-title function_">invokeArrayFns</span>(instance.<span class="hljs-property">rtg</span>, e) : <span class="hljs-keyword">void</span> <span class="hljs-number">0</span>,
+  &#125;;
+&#125;</code></pre>
+<p>通过上述代码我们发现，onRenderTracked 和 onRenderTriggered 注册的钩子函数，原来是在副作用渲染函数的 onTrack 和 onTrigger 对应的函数中执行的。</p>
+<p>我们当时介绍 effect 副作用函数的配置时并没有介绍这两个属性，那么它们是做什么用的呢？</p>
+<p>这就要先来看 onTrack 函数的执行时机。我们知道当访问一个响应式对象时，会执行 track 函数做依赖收集，我们来回顾一下它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">track</span>(<span class="hljs-params">target, type, key</span>) &#123;
+  <span class="hljs-comment">// 执行一些依赖收集的操作</span>
+
+  <span class="hljs-keyword">if</span> (!dep.<span class="hljs-title function_">has</span>(activeEffect)) &#123;
+    dep.<span class="hljs-title function_">add</span>(activeEffect);
+    activeEffect.<span class="hljs-property">deps</span>.<span class="hljs-title function_">push</span>(dep);
+    <span class="hljs-keyword">if</span> (process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> !== <span class="hljs-string">&quot;production&quot;</span> &amp;&amp; activeEffect.<span class="hljs-property">options</span>.<span class="hljs-property">onTrack</span>) &#123;
+      <span class="hljs-comment">// 执行 onTrack 函数</span>
+      activeEffect.<span class="hljs-property">options</span>.<span class="hljs-title function_">onTrack</span>(&#123;
+        <span class="hljs-attr">effect</span>: activeEffect,
+        target,
+        type,
+        key,
+      &#125;);
+    &#125;
+  &#125;
+&#125;</code></pre>
+<p>可以看到，track 函数先执行依赖收集，然后在非生产环境下检测当前的 activeEffect 的配置有没有定义 onTrack 函数，如果有的则执行该方法。</p>
+<p>因此对应到副作用渲染函数，当它执行的时候，activeEffect 就是这个副作用渲染函数，这时访问响应式数据就会触发 track 函数，<strong>在执行完依赖收集后，会执行 onTrack 函数，也就是遍历执行我们注册的 renderTracked 钩子函数</strong>。</p>
+<p>接下来，我们再来回顾一下 trigger 函数的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">trigger</span>(<span class="hljs-params">target, type, key, newValue</span>) &#123;
+  <span class="hljs-comment">// 添加要运行的 effects 集合</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">run</span> = (<span class="hljs-params">effect</span>) =&gt; &#123;
+    <span class="hljs-keyword">if</span> (process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> !== <span class="hljs-string">&quot;production&quot;</span> &amp;&amp; effect.<span class="hljs-property">options</span>.<span class="hljs-property">onTrigger</span>) &#123;
+      <span class="hljs-comment">// 执行 onTrigger</span>
+      effect.<span class="hljs-property">options</span>.<span class="hljs-title function_">onTrigger</span>(&#123;
+        effect,
+        target,
+        key,
+        type,
+        newValue,
+        oldValue,
+        oldTarget,
+      &#125;);
+    &#125;
+    <span class="hljs-keyword">if</span> (effect.<span class="hljs-property">options</span>.<span class="hljs-property">scheduler</span>) &#123;
+      effect.<span class="hljs-property">options</span>.<span class="hljs-title function_">scheduler</span>(effect);
+    &#125; <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-title function_">effect</span>();
+    &#125;
+  &#125;;
+  <span class="hljs-comment">// 遍历执行 effects</span>
+  effects.<span class="hljs-title function_">forEach</span>(run);
+&#125;</code></pre>
+<p>我们知道，trigger 函数首先要创建运行的 effects 集合，然后遍历执行，在执行的过程中，会在非生产环境下检测待执行的 effect 配置中有没有定义 onTrigger 函数，如果有则执行该方法。</p>
+<p>因此对应到我们的副作用渲染函数，当它内部依赖的响应式对象值被修改后，就会触发 trigger 函数 ，这个时候副作用渲染函数就会被添加到要运行的 effects 集合中，<strong>在遍历执行 effects 的时候会执行 onTrigger 函数，也就是遍历执行我们注册的 renderTriggered 钩子函数</strong>。</p>
+<p>了解完 renderTracked 和 renderTriggered 钩子函数的执行时机后，我们来看一下实际场景的应用：</p>
+<pre><code class="hljs javascript">&lt;template&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span></span>
+<span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span></span>
+<span class="language-xml">      <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>&#123;&#123;count&#125;&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+<span class="language-xml">      <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;increase&quot;</span>&gt;</span>Increase<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span>
+<span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+<span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+&lt;/template&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"></span></span>
+<span class="language-javascript"><span class="language-xml">  <span class="hljs-keyword">import</span> &#123; ref, onRenderTracked, onRenderTriggered &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;vue&#x27;</span></span></span>
+<span class="language-javascript"><span class="language-xml">  <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">    setup () &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-keyword">const</span> count = <span class="hljs-title function_">ref</span>(<span class="hljs-number">0</span>)</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-keyword">function</span> <span class="hljs-title function_">increase</span> () &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        count.<span class="hljs-property">value</span>++</span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-title function_">onRenderTracked</span>(<span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(e)</span></span>
+<span class="language-javascript"><span class="language-xml">        <span class="hljs-keyword">debugger</span></span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;)</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-title function_">onRenderTriggered</span>(<span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(e)</span></span>
+<span class="language-javascript"><span class="language-xml">        <span class="hljs-keyword">debugger</span></span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;)</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-keyword">return</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        count,</span></span>
+<span class="language-javascript"><span class="language-xml">        increase</span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;</span></span>
+<span class="language-javascript"><span class="language-xml">    &#125;</span></span>
+<span class="language-javascript"><span class="language-xml">  &#125;</span></span>
+<span class="language-javascript"><span class="language-xml"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span></code></pre>
+<p><strong>像这样</strong>在开发阶段，我们可以通过注册这两个钩子函数，来追踪组件渲染的依赖来源以及触发组件重新渲染的数据更新来源。</p>
+<h2 id="7-总结">7 总结</h2>
+<p>好的，到这里我们本篇就结束啦，通过学习，你应该掌握 Vue.js 中生命周期注册的 API，了解各个生命周期的执行时机和应用场景。</p>
+<p>最后，我们通过一张图再来直观地感受一下组件的各个生命周期：</p>
+<p><img src="http://assets.eggcake.cn/Ciqc1F8zkvmAR_QpAAJxUtKU_4s942.png" alt="Ciqc1F8zkvmAR_QpAAJxUtKU_4s942.png" referrerPolicy="no-referrer"><br>
+Vue.js 3.0 还有 2 个生命周期 API，分别是 onActivated 和 onDeactivated，我们将会在介绍 KeepAlive 组件时详细分析。</p>
+<p>最后，思考一个问题，如果你想在路由组件切换的时候，取消组件正在发送的异步 Ajax 请求，那你应该在哪个生命周期写这个逻辑呢？</p>
+<blockquote>
+<p>取消 ajax 的请求和 setInterval 其实是类似的，所以建议在 beforeUnmount 中写这个逻辑，当然理论上在 unmount 写也是没问题的。</p>
+</blockquote>
+<blockquote>
+<p><strong>本篇的相关代码在源代码中的位置如下</strong>：<br>
+packages/runtime-core/src/apiLifecycle.ts<br>
+packages/runtime-core/src/renderer.ts<br>
+packages/reactivity/src/effect.ts</p>
+</blockquote>
+ 
+      <div id="toc-article">
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%B3%A8%E5%86%8C%E9%92%A9%E5%AD%90%E5%87%BD%E6%95%B0"><span class="toc-text">1 注册钩子函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-onBeforeMount-%E5%92%8C-onMounted"><span class="toc-text">2 onBeforeMount 和 onMounted</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-onBeforeUpdate-%E5%92%8C-onUpdated"><span class="toc-text">3 onBeforeUpdate 和 onUpdated</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-onBeforeUnmount-%E5%92%8C-onUnmounted"><span class="toc-text">4 onBeforeUnmount 和 onUnmounted</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-onErrorCaptured"><span class="toc-text">5 onErrorCaptured</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-onRenderTracked-%E5%92%8C-onRenderTriggered"><span class="toc-text">6 onRenderTracked 和 onRenderTriggered</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%80%BB%E7%BB%93"><span class="toc-text">7 总结</span></a></li></ol>
+    </div>
+  </div>
+
+</div>
+       
+      <blockquote id="copyright">
+        <p>
+           原文链接:
+          <a href="https://jesse121.github.io/blog/articles/2021/01/14.html"
+            >https://jesse121.github.io/blog/articles/2021/01/14.html</a
+          >
+        </p>
+        <p>版权声明: 转载请注明出处.</p>
+      </blockquote>
+       
+    </div>
+    <footer class="article-footer">
+      
+      <div class="article-tag-wrap">
+        
+ 
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/vue/" rel="tag">vue</a></li></ul>
+ 
+
+
+      </div>
+        
+<nav id="article-nav">
+  
+    <a href="/blog/articles/2021/01/13.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          Vue3.0核心源码解读 | 侦听器：侦听器的实现原理和使用场景是什么？（下）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/articles/2021/01/15.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Vue3.0核心源码解读 | 依赖注入：子孙组件如何共享数据？
+        
+      </div>
+    </a>
+  
+</nav>
+   
+  <div id="comments"></div>
+
+
+
+
+
+
+
+
+ 
+    </footer>
+  </div>
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
+  <div class="widget">
+    <ul>
+       
+      <li>
+        <a href="/blog/articles/2023/06/18.html"
+          >页面添加动态水印的处理方法</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/27.html"
+          >前端项目如何自定义页面Import排序？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/20.html"
+          >图片二进制流如何在页面显示？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/15.html"
+          >如何编写Vue3组件测试用例？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/14.html"
+          >Vue3项目如何利用vitest做单元测试</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/12/18.html"
+          >《第一本Docker书》--读书笔记</a
+        >
+      </li>
+          
+      <li>
+        <a href="/blog/articles/2022/11/22.html"
+          >基于ElementPlus封装的季度选择器组件</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/11/16.html"
+          >掘金小册-Electron+Vue3桌面应用开发学习记录</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/10/29.html"
+          >如何使用Monorepo实现跨项目共享组件和模块</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/09/10.html"
+          >手写Promise思考过程</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/08.html"
+          >如何解决Electron应用安装在C盘没有权限更新的问题</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/05.html"
+          >如何用Electron+vue+vite构建桌面端应用(三)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/04.html"
+          >如何用Electron+vue+vite构建桌面端应用(二)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/22.html"
+          >从源码分析为什么Electron+vue项目中router不能用history模式</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/20.html"
+          >如何用Electron+vue+vite构建桌面端应用(一)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/06/15.html"
+          >如何在国产银河麒麟系统Mips架构上离线安装electron</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/11/28.html"
+          >《学习Javascript数据结构和算法》--读书笔记</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/10/27.html"
+          >极客时间-正则表达式</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/09/04.html"
+          >Typescript内置工具类型和操作符介绍</a
+        >
+      </li>
+       
+    </ul>
+  </div>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/angularjs/" style="font-size: 10px;">AngularJs</a> <a href="/blog/tags/apache/" style="font-size: 12.22px;">Apache</a> <a href="/blog/tags/arraybuffer/" style="font-size: 10px;">ArrayBuffer</a> <a href="/blog/tags/axios/" style="font-size: 10px;">Axios</a> <a href="/blog/tags/blob/" style="font-size: 10px;">Blob</a> <a href="/blog/tags/bootstrap/" style="font-size: 12.22px;">Bootstrap</a> <a href="/blog/tags/css/" style="font-size: 16.67px;">CSS</a> <a href="/blog/tags/canvas/" style="font-size: 10px;">Canvas</a> <a href="/blog/tags/centos/" style="font-size: 10px;">CentOS</a> <a href="/blog/tags/charles/" style="font-size: 10px;">Charles</a> <a href="/blog/tags/docker/" style="font-size: 13.33px;">Docker</a> <a href="/blog/tags/elementplus/" style="font-size: 10px;">ElementPlus</a> <a href="/blog/tags/eslint/" style="font-size: 10px;">Eslint</a> <a href="/blog/tags/git/" style="font-size: 11.11px;">Git</a> <a href="/blog/tags/gitlab/" style="font-size: 10px;">Gitlab</a> <a href="/blog/tags/gulp/" style="font-size: 10px;">Gulp</a> <a href="/blog/tags/html/" style="font-size: 12.22px;">HTML</a> <a href="/blog/tags/html5/" style="font-size: 10px;">HTML5</a> <a href="/blog/tags/http/" style="font-size: 12.22px;">HTTP</a> <a href="/blog/tags/https/" style="font-size: 10px;">HTTPS</a> <a href="/blog/tags/husky/" style="font-size: 10px;">Husky</a> <a href="/blog/tags/javascript/" style="font-size: 18.89px;">JavaScript</a> <a href="/blog/tags/jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/blog/tags/linux/" style="font-size: 11.11px;">Linux</a> <a href="/blog/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/blog/tags/mutationobserver/" style="font-size: 10px;">MutationObserver</a> <a href="/blog/tags/mysql/" style="font-size: 12.22px;">MySQL</a> <a href="/blog/tags/nginx/" style="font-size: 11.11px;">Nginx</a> <a href="/blog/tags/node-js/" style="font-size: 11.11px;">Node.js</a> <a href="/blog/tags/php/" style="font-size: 14.44px;">PHP</a> <a href="/blog/tags/photoshop/" style="font-size: 10px;">Photoshop</a> <a href="/blog/tags/react/" style="font-size: 10px;">React</a> <a href="/blog/tags/redux/" style="font-size: 10px;">Redux</a> <a href="/blog/tags/regexp/" style="font-size: 10px;">Regexp</a> <a href="/blog/tags/sse/" style="font-size: 10px;">SSE</a> <a href="/blog/tags/sublimetext3/" style="font-size: 10px;">SublimeText3</a> <a href="/blog/tags/svg/" style="font-size: 10px;">Svg</a> <a href="/blog/tags/typescript/" style="font-size: 13.33px;">Typescript</a> <a href="/blog/tags/vagrant/" style="font-size: 10px;">Vagrant</a> <a href="/blog/tags/vim/" style="font-size: 10px;">Vim</a> <a href="/blog/tags/vitest/" style="font-size: 11.11px;">Vitest</a> <a href="/blog/tags/vue/" style="font-size: 10px;">Vue</a> <a href="/blog/tags/vue3/" style="font-size: 14.44px;">Vue3</a> <a href="/blog/tags/web/" style="font-size: 14.44px;">WEB</a> <a href="/blog/tags/webpack/" style="font-size: 12.22px;">Webpack</a> <a href="/blog/tags/wireshark/" style="font-size: 11.11px;">Wireshark</a> <a href="/blog/tags/yii/" style="font-size: 10px;">Yii</a> <a href="/blog/tags/electron/" style="font-size: 15.56px;">electron</a> <a href="/blog/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/blog/tags/jquery/" style="font-size: 12.22px;">jQuery</a> <a href="/blog/tags/kylin/" style="font-size: 10px;">kylin</a> <a href="/blog/tags/monorepo/" style="font-size: 10px;">monorepo</a> <a href="/blog/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/blog/tags/vite/" style="font-size: 13.33px;">vite</a> <a href="/blog/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/blog/tags/vue/" style="font-size: 20px;">vue</a> <a href="/blog/tags/vue3/" style="font-size: 13.33px;">vue3</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">前端监控</a> <a href="/blog/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/" style="font-size: 10px;">微信小程序</a> <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 17.78px;">数据结构</a> <a href="/blog/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.78px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/bootstrap/">Bootstrap</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/electron/">Electron</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html-css/">HTML-CSS</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html5/">HTML5</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/javascript/">JavaScript</a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/mysql/">MySQL</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/node-js/">Node.js</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/php/">PHP</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/photoshop/">Photoshop</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/regexp/">Regexp</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/typescript/">Typescript</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/vue3/">Vue3</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/web/">WEB</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/jquery/">jQuery</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%85%B6%E4%BB%96/">其他</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/translation/">前端翻译</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">开发问题记录</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E7%AE%97%E6%B3%95/">算法</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/notes/">读书笔记</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2023/">2023年</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2022/">2022年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2021/">2021年</a><span class="archive-list-count">40</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/">2020年</a><span class="archive-list-count">20</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/">2019年</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/">2018年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/">2017年</a><span class="archive-list-count">26</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/">2016年</a><span class="archive-list-count">27</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-link"></i> 收藏</h3>
+    <div class="widget">
+      <ul>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.mahaixiang.cn/internet/300.html">深入理解互联网协议的原理</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://javascript.ruanyifeng.com/">JavaScript 标准参考教程</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7131211363493347335">JavaScript代码优化之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7224382896626778172">简述 js 的代码整洁之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.eggcake.cn/posts/2020-12-19-vue3-core-source-code-0">Vue3.0核心源码解读</a>
+        </li>
+      
+      </ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <a id="totop" href="#top"></a>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <p>
+        <a href="/blog/sitemap.xml">网站地图</a>
+        <span> | </span
+        ><a href="/blog/atom.xml">订阅本站</a>
+        <span> | </span
+        ><a href="/blog/about/">联系博主</a>
+      </p>
+      
+      <p>
+        <i class="fa fa-visitors"></i>
+        <i id="busuanzi_container_site_uv"
+          ><i id="busuanzi_value_site_uv"></i
+        ></i>
+        ，
+        <i class="fa fa-views"></i>
+        <i id="busuanzi_container_site_pv"
+          ><i id="busuanzi_value_site_pv"></i
+        ></i>
+      </p>
+      
+      <p>
+        <span
+          >Copyright &copy; 2026 Jesse.</span
+        >
+        <span
+          >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span
+        >
+      </p>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+  
+<script src="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+
+<script>
+  hljs.highlightAll();
+</script>
+
+<script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+<script src="/blog/js/search.json.js"></script>
+  
+<script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+ 
+<script src="/blog/js/script.js"></script>
+ 
+ 
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?8e59984317ab1777a88e5b3e62c7c767";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+  
+<script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+      
+<script src="https://unpkg.com/gitalk@1.7.2/dist/gitalk.min.js"></script>
+ 
+<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: "3c3e422527fd3f9fa17a",
+    clientSecret: "f28d1808ec9ab69fb24dc3e9fad81e1c3ab8dd83",
+    repo: "blog",
+    owner: "jesse121",
+    admin: ["jesse121"],
+    id: md5(window.location.pathname),
+    proxy: "https://stormy-gorge-51623.herokuapp.com/https://github.com/login/oauth/access_token",
+    distractionFreeMode: false,
+    language: "zh-CN",
+    body: "欢迎在下方提出问题，您的疑问促进我们共同进步！",
+    pagerDirection: "last",
+  });
+  gitalk.render("comments");
+</script>
+         
+ 
+<script
+  type="text/javascript"
+  src="https://unpkg.com/clipboard@2.0.4/dist/clipboard.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="/blog/js/codeBlock/codeBlockFunction.js"
+></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeLang.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeCopy.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeShrink.js"></script>
+
+</body>
+</html>

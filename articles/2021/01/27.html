@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+   
+  <title>Vue3.0 核心源码解读 | Vue Router：如何实现一个前端路由？（下） | 前端之路</title>
+  <meta name="theme-color" content="#bccddd" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <meta name="description" content="专注前端开发，前端开发技术博客" />
+   
+  <meta name="keywords" content="Web前端开发，Javascript，前端开发博客" />
+  
+  <link rel="dns-prefetch" href="https://unpkg.com" />
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info" />
+   <link rel="alternate" href="/blog/atom.xml" title="前端之路" type="application/atom+xml">   <link rel="shortcut icon" href="/blog/favicon.ico"> 
+  <link rel="bookmark" href="/blog/favicon.ico" />
+  <link rel="apple-touch-icon" href="/blog/apple-touch-icon.png" />
+  <link rel="apple-touch-icon-precomposed" href="/blog/apple-touch-icon.png" />
+   
+<link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/xt256.min.css">
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+  
+<link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+    
+<link rel="stylesheet" href="https://unpkg.com/gitalk@1.7.2/dist/gitalk.css">
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">前端之路</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">路漫漫其修远兮，吾将上下而求索</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/blog/."><i class="fa fa-home"></i> 首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives/"><i class="fa fa-archive"></i> 归档</a>
+        
+          <a class="main-nav-link" href="/blog/about/"><i class="fa fa-user"></i> 关于</a>
+        
+      </nav>
+    </div>
+    <div id="search-form">
+      <div id="result-mask" class="hide"></div>
+      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
+      <div id="result-wrap" class="hide">
+        <div id="search-result"></div>
+      </div>
+      <div class="hide">
+        <template id="search-tpl">
+          <div class="item">
+            <a href="/{path}" title="{title}">
+              <div class="title">{title}</div>
+              <div class="time">{date}</div>
+              <div class="tags">{tags}</div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><style>
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    /* font-size: 0.91rem; */
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  pre code {
+    padding: 0 !important;
+    color: #e8eaf6;
+    background-color: #272822;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+  .line-numbers-rows {
+    border-right-width: 0px !important;
+  }
+
+  .line-numbers {
+    padding: 1.5rem 1.5rem 1.5rem 3.2rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre {
+    padding: 1.5rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre::before {
+    content: "";
+    height: 16px;
+    margin-bottom: 0;
+    display: block;
+  }
+
+  pre::after {
+    content: " ";
+    position: absolute;
+    border-radius: 50%;
+    background: #ff5f56;
+    width: 12px;
+    height: 12px;
+    top: 0;
+    left: 12px;
+    margin-top: 12px;
+    -webkit-box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+    box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+  }
+
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    font-size: 0.91rem;
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  .code_copy {
+    position: absolute;
+    top: 0.7rem;
+    right: 35px;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code_lang {
+    position: absolute;
+    top: 1.2rem;
+    right: 60px;
+    line-height: 0;
+    font-weight: bold;
+    font-family: normal;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code-expand {
+    position: absolute;
+    top: 4px;
+    right: 0px;
+    filter: invert(50%);
+    padding: 7px 10px;
+    z-index: 1;
+    cursor: pointer;
+    transition: all 0.3s;
+    transform: rotate(0deg);
+  }
+
+  .code-closed .code-expand {
+    transform: rotate(-180deg) !important;
+    transition: all 0.3s;
+  }
+
+  .code-closed pre::before {
+    height: 0px;
+  }
+
+  pre code {
+    padding: 0;
+    color: #e8eaf6;
+    background-color: #272822 !important;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+</style>
+<article
+  id="post-vue3/2021-01-27-vue3-core-source-code-27"
+  class="h-entry article article-type-post"
+  itemprop="blogPost"
+  itemscope
+  itemtype="https://schema.org/BlogPosting"
+>
+  <div class="article-inner">
+     
+    <header class="article-header">
+      
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Vue3.0 核心源码解读 | Vue Router：如何实现一个前端路由？（下）
+    </h1>
+  
+
+
+    </header>
+    
+    <div class="article-meta">
+       <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2021-01-27T03:00:00.000Z" itemprop="datePublished">2021年01月27日</time>
+</span>   <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+  
+<a href="/blog/articles/2021/01/27.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+       <blockquote>
+<p>纸上得来终觉浅，绝知此事要躬行。</p>
+</blockquote>
+<p>上一篇我们熟悉了 Vue Router 的基本用法，并且开始探究它的实现原理，今天我们继续未完的原理，一起来看路径是如何和路由组件映射的。</p>
+<h2 id="1-路径和路由组件的渲染的映射">1 路径和路由组件的渲染的映射</h2>
+<p>通过前面的示例我们了解到，路由组件就是通过 RouterView 组件渲染的，那么 RouterView 是怎么渲染的呢，我们来看它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">RouterView</span> = <span class="hljs-title function_">defineComponent</span>(&#123;
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;RouterView&quot;</span>,
+  <span class="hljs-attr">props</span>: &#123;
+    <span class="hljs-attr">name</span>: &#123;
+      <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+      <span class="hljs-attr">default</span>: <span class="hljs-string">&quot;default&quot;</span>,
+    &#125;,
+    <span class="hljs-attr">route</span>: <span class="hljs-title class_">Object</span>,
+  &#125;,
+  <span class="hljs-title function_">setup</span>(<span class="hljs-params">props, &#123; attrs, slots &#125;</span>) &#123;
+    <span class="hljs-title function_">warnDeprecatedUsage</span>();
+    <span class="hljs-keyword">const</span> injectedRoute = <span class="hljs-title function_">inject</span>(routeLocationKey);
+    <span class="hljs-keyword">const</span> depth = <span class="hljs-title function_">inject</span>(viewDepthKey, <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">const</span> matchedRouteRef = <span class="hljs-title function_">computed</span>(
+      <span class="hljs-function">() =&gt;</span> (props.<span class="hljs-property">route</span> || injectedRoute).<span class="hljs-property">matched</span>[depth]
+    );
+    <span class="hljs-title function_">provide</span>(viewDepthKey, depth + <span class="hljs-number">1</span>);
+    <span class="hljs-title function_">provide</span>(matchedRouteKey, matchedRouteRef);
+    <span class="hljs-keyword">const</span> viewRef = <span class="hljs-title function_">ref</span>();
+    <span class="hljs-title function_">watch</span>(
+      <span class="hljs-function">() =&gt;</span> [viewRef.<span class="hljs-property">value</span>, matchedRouteRef.<span class="hljs-property">value</span>, props.<span class="hljs-property">name</span>],
+      <span class="hljs-function">(<span class="hljs-params">[instance, to, name], [oldInstance, <span class="hljs-keyword">from</span>, oldName]</span>) =&gt;</span> &#123;
+        <span class="hljs-keyword">if</span> (to) &#123;
+          to.<span class="hljs-property">instances</span>[name] = instance;
+          <span class="hljs-keyword">if</span> (<span class="hljs-keyword">from</span> &amp;&amp; instance === oldInstance) &#123;
+            to.<span class="hljs-property">leaveGuards</span> = <span class="hljs-keyword">from</span>.<span class="hljs-property">leaveGuards</span>;
+            to.<span class="hljs-property">updateGuards</span> = <span class="hljs-keyword">from</span>.<span class="hljs-property">updateGuards</span>;
+          &#125;
+        &#125;
+        <span class="hljs-keyword">if</span> (
+          instance &amp;&amp;
+          to &amp;&amp;
+          (!<span class="hljs-keyword">from</span> || !<span class="hljs-title function_">isSameRouteRecord</span>(to, <span class="hljs-keyword">from</span>) || !oldInstance)
+        ) &#123;
+          (to.<span class="hljs-property">enterCallbacks</span>[name] || []).<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">callback</span>) =&gt;</span>
+            <span class="hljs-title function_">callback</span>(instance)
+          );
+        &#125;
+      &#125;
+    );
+    <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span> &#123;
+      <span class="hljs-keyword">const</span> route = props.<span class="hljs-property">route</span> || injectedRoute;
+      <span class="hljs-keyword">const</span> matchedRoute = matchedRouteRef.<span class="hljs-property">value</span>;
+      <span class="hljs-keyword">const</span> <span class="hljs-title class_">ViewComponent</span> = matchedRoute &amp;&amp; matchedRoute.<span class="hljs-property">components</span>[props.<span class="hljs-property">name</span>];
+      <span class="hljs-keyword">const</span> currentName = props.<span class="hljs-property">name</span>;
+      <span class="hljs-keyword">if</span> (!<span class="hljs-title class_">ViewComponent</span>) &#123;
+        <span class="hljs-keyword">return</span> slots.<span class="hljs-property">default</span>
+          ? slots.<span class="hljs-title function_">default</span>(&#123; <span class="hljs-title class_">Component</span>: <span class="hljs-title class_">ViewComponent</span>, route &#125;)
+          : <span class="hljs-literal">null</span>;
+      &#125;
+      <span class="hljs-keyword">const</span> routePropsOption = matchedRoute.<span class="hljs-property">props</span>[props.<span class="hljs-property">name</span>];
+      <span class="hljs-keyword">const</span> routeProps = routePropsOption
+        ? routePropsOption === <span class="hljs-literal">true</span>
+          ? route.<span class="hljs-property">params</span>
+          : <span class="hljs-keyword">typeof</span> routePropsOption === <span class="hljs-string">&quot;function&quot;</span>
+          ? <span class="hljs-title function_">routePropsOption</span>(route)
+          : routePropsOption
+        : <span class="hljs-literal">null</span>;
+      <span class="hljs-keyword">const</span> <span class="hljs-title function_">onVnodeUnmounted</span> = (<span class="hljs-params">vnode</span>) =&gt; &#123;
+        <span class="hljs-keyword">if</span> (vnode.<span class="hljs-property">component</span>.<span class="hljs-property">isUnmounted</span>) &#123;
+          matchedRoute.<span class="hljs-property">instances</span>[currentName] = <span class="hljs-literal">null</span>;
+        &#125;
+      &#125;;
+      <span class="hljs-keyword">const</span> component = <span class="hljs-title function_">h</span>(
+        <span class="hljs-title class_">ViewComponent</span>,
+        <span class="hljs-title function_">assign</span>(&#123;&#125;, routeProps, attrs, &#123;
+          onVnodeUnmounted,
+          <span class="hljs-attr">ref</span>: viewRef,
+        &#125;)
+      );
+      <span class="hljs-keyword">return</span> slots.<span class="hljs-property">default</span>
+        ? slots.<span class="hljs-title function_">default</span>(&#123; <span class="hljs-title class_">Component</span>: component, route &#125;)
+        : component;
+    &#125;;
+  &#125;,
+&#125;);</code></pre>
+<p>RouterView 组件也是基于 composition API 实现的，我们重点看它的渲染部分，由于 setup 函数的返回值是一个函数，那这个函数就是它的渲染函数。</p>
+<p>我们从后往前看，通常不带插槽的情况下，会返回 component 变量，它是根据 ViewComponent 渲染出来的，而 ViewComponent 是根据 matchedRoute.components[<a target="_blank" rel="noopener" href="http://props.name">props.name</a>] 求得的，而 matchedRoute 是 matchedRouteRef 对应的 value。</p>
+<p>matchedRouteRef 一个计算属性，在不考虑 prop 传入 route 的情况下，它的 getter 是由 injectedRoute.matched[depth] 求得的，而 injectedRoute，就是我们在前面在安装路由时候，注入的响应式 currentRoute 对象，而 depth 就是表示这个 RouterView 的嵌套层级。</p>
+<p>所以我们可以看到，RouterView 的渲染的路由组件和当前路径 currentRoute 的 matched 对象相关，也和 RouterView 自身的嵌套层级相关。</p>
+<p>那么接下来，我们就来看路径对象中的 matched 的值是怎么在路径切换的情况下更新的。</p>
+<p>我们还是通过示例的方式来说明，我们对前面的示例稍做修改，加上嵌套路由的场景：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; createApp &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;vue&quot;</span>;
+<span class="hljs-keyword">import</span> &#123; createRouter, createWebHashHistory &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;vue-router&quot;</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Home</span> = &#123; <span class="hljs-attr">template</span>: <span class="hljs-string">&quot;&lt;div&gt;Home&lt;/div&gt;&quot;</span> &#125;;
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">About</span> = &#123;
+  <span class="hljs-attr">template</span>: <span class="hljs-string">`&lt;div&gt;About</span>
+<span class="hljs-string">  &lt;router-link to=&quot;/about/user&quot;&gt;Go User&lt;/router-link&gt;</span>
+<span class="hljs-string">  &lt;router-view&gt;&lt;/router-view&gt;</span>
+<span class="hljs-string">  &lt;/div&gt;`</span>,
+&#125;;
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = &#123;
+  <span class="hljs-attr">template</span>: <span class="hljs-string">&quot;&lt;div&gt;User&lt;/div&gt;,&quot;</span>,
+&#125;;
+<span class="hljs-keyword">const</span> routes = [
+  &#123; <span class="hljs-attr">path</span>: <span class="hljs-string">&quot;/&quot;</span>, <span class="hljs-attr">component</span>: <span class="hljs-title class_">Home</span> &#125;,
+  &#123;
+    <span class="hljs-attr">path</span>: <span class="hljs-string">&quot;/about&quot;</span>,
+    <span class="hljs-attr">component</span>: <span class="hljs-title class_">About</span>,
+    <span class="hljs-attr">children</span>: [
+      &#123;
+        <span class="hljs-attr">path</span>: <span class="hljs-string">&quot;user&quot;</span>,
+        <span class="hljs-attr">component</span>: <span class="hljs-title class_">User</span>,
+      &#125;,
+    ],
+  &#125;,
+];
+<span class="hljs-keyword">const</span> router = <span class="hljs-title function_">createRouter</span>(&#123;
+  <span class="hljs-attr">history</span>: <span class="hljs-title function_">createWebHashHistory</span>(),
+  routes,
+&#125;);
+<span class="hljs-keyword">const</span> app = <span class="hljs-title function_">createApp</span>(&#123;&#125;);
+app.<span class="hljs-title function_">use</span>(router);
+app.<span class="hljs-title function_">mount</span>(<span class="hljs-string">&quot;#app&quot;</span>);</code></pre>
+<p>它和前面示例的区别在于，我们在 About 路由组件中又嵌套了一个 RouterView 组件，然后对 routes 数组中 path 为 /about 的路径配置扩展了 children 属性，对应的就是 About 组件嵌套路由的配置。</p>
+<p>当我们执行 createRouter 函数创建路由的时候，内部会执行如下代码来创建一个 matcher 对象：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> matcher = <span class="hljs-title function_">createRouterMatcher</span>(options.<span class="hljs-property">routes</span>, options);</code></pre>
+<p>执行了 createRouterMatcher 函数，并传入 routes 路径配置数组，它的目的就是根据路径配置对象创建一个路由的匹配对象，再来看它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">createRouterMatcher</span>(<span class="hljs-params">routes, globalOptions</span>) &#123;
+  <span class="hljs-keyword">const</span> matchers = [];
+  <span class="hljs-keyword">const</span> matcherMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+  globalOptions = <span class="hljs-title function_">mergeOptions</span>(
+    &#123; <span class="hljs-attr">strict</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">end</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">sensitive</span>: <span class="hljs-literal">false</span> &#125;,
+    globalOptions
+  );
+
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">addRoute</span>(<span class="hljs-params">record, parent, originalRecord</span>) &#123;
+    <span class="hljs-keyword">let</span> isRootAdd = !originalRecord;
+    <span class="hljs-keyword">let</span> mainNormalizedRecord = <span class="hljs-title function_">normalizeRouteRecord</span>(record);
+    mainNormalizedRecord.<span class="hljs-property">aliasOf</span> = originalRecord &amp;&amp; originalRecord.<span class="hljs-property">record</span>;
+    <span class="hljs-keyword">const</span> options = <span class="hljs-title function_">mergeOptions</span>(globalOptions, record);
+    <span class="hljs-keyword">const</span> normalizedRecords = [mainNormalizedRecord];
+    <span class="hljs-keyword">let</span> matcher;
+    <span class="hljs-keyword">let</span> originalMatcher;
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> normalizedRecord <span class="hljs-keyword">of</span> normalizedRecords) &#123;
+      <span class="hljs-keyword">let</span> &#123; path &#125; = normalizedRecord;
+      <span class="hljs-keyword">if</span> (parent &amp;&amp; path[<span class="hljs-number">0</span>] !== <span class="hljs-string">&quot;/&quot;</span>) &#123;
+        <span class="hljs-keyword">let</span> parentPath = parent.<span class="hljs-property">record</span>.<span class="hljs-property">path</span>;
+        <span class="hljs-keyword">let</span> connectingSlash =
+          parentPath[parentPath.<span class="hljs-property">length</span> - <span class="hljs-number">1</span>] === <span class="hljs-string">&quot;/&quot;</span> ? <span class="hljs-string">&quot;&quot;</span> : <span class="hljs-string">&quot;/&quot;</span>;
+        normalizedRecord.<span class="hljs-property">path</span> =
+          parent.<span class="hljs-property">record</span>.<span class="hljs-property">path</span> + (path &amp;&amp; connectingSlash + path);
+      &#125;
+      matcher = <span class="hljs-title function_">createRouteRecordMatcher</span>(normalizedRecord, parent, options);
+      <span class="hljs-keyword">if</span> (parent &amp;&amp; path[<span class="hljs-number">0</span>] === <span class="hljs-string">&quot;/&quot;</span>)
+        <span class="hljs-title function_">checkMissingParamsInAbsolutePath</span>(matcher, parent);
+      <span class="hljs-keyword">if</span> (originalRecord) &#123;
+        originalRecord.<span class="hljs-property">alias</span>.<span class="hljs-title function_">push</span>(matcher);
+        &#123;
+          <span class="hljs-title function_">checkSameParams</span>(originalRecord, matcher);
+        &#125;
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        originalMatcher = originalMatcher || matcher;
+        <span class="hljs-keyword">if</span> (originalMatcher !== matcher) originalMatcher.<span class="hljs-property">alias</span>.<span class="hljs-title function_">push</span>(matcher);
+        <span class="hljs-keyword">if</span> (isRootAdd &amp;&amp; record.<span class="hljs-property">name</span> &amp;&amp; !<span class="hljs-title function_">isAliasRecord</span>(matcher))
+          <span class="hljs-title function_">removeRoute</span>(record.<span class="hljs-property">name</span>);
+      &#125;
+      <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;children&quot;</span> <span class="hljs-keyword">in</span> mainNormalizedRecord) &#123;
+        <span class="hljs-keyword">let</span> children = mainNormalizedRecord.<span class="hljs-property">children</span>;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; children.<span class="hljs-property">length</span>; i++) &#123;
+          <span class="hljs-title function_">addRoute</span>(
+            children[i],
+            matcher,
+            originalRecord &amp;&amp; originalRecord.<span class="hljs-property">children</span>[i]
+          );
+        &#125;
+      &#125;
+      originalRecord = originalRecord || matcher;
+      <span class="hljs-title function_">insertMatcher</span>(matcher);
+    &#125;
+    <span class="hljs-keyword">return</span> originalMatcher
+      ? <span class="hljs-function">() =&gt;</span> &#123;
+          <span class="hljs-title function_">removeRoute</span>(originalMatcher);
+        &#125;
+      : noop;
+  &#125;
+
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">insertMatcher</span>(<span class="hljs-params">matcher</span>) &#123;
+    <span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">while</span> (
+      i &lt; matchers.<span class="hljs-property">length</span> &amp;&amp;
+      <span class="hljs-title function_">comparePathParserScore</span>(matcher, matchers[i]) &gt;= <span class="hljs-number">0</span>
+    )
+      i++;
+    matchers.<span class="hljs-title function_">splice</span>(i, <span class="hljs-number">0</span>, matcher);
+    <span class="hljs-keyword">if</span> (matcher.<span class="hljs-property">record</span>.<span class="hljs-property">name</span> &amp;&amp; !<span class="hljs-title function_">isAliasRecord</span>(matcher))
+      matcherMap.<span class="hljs-title function_">set</span>(matcher.<span class="hljs-property">record</span>.<span class="hljs-property">name</span>, matcher);
+  &#125;
+  <span class="hljs-comment">// 定义其它一些辅助函数</span>
+
+  <span class="hljs-comment">// 添加初始路径</span>
+  routes.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">route</span>) =&gt;</span> <span class="hljs-title function_">addRoute</span>(route));
+  <span class="hljs-keyword">return</span> &#123; addRoute, resolve, removeRoute, getRoutes, getRecordMatcher &#125;;
+&#125;</code></pre>
+<p>createRouterMatcher 函数内部定义了一个 matchers 数组和一些辅助函数，我们先重点关注 addRoute 函数的实现，我们只关注核心流程。</p>
+<p>在 createRouterMatcher 函数的最后，会遍历 routes 路径数组调用 addRoute 方法添加初始路径。</p>
+<p>在 addRoute 函数内部，首先会把 route 对象标准化成一个 record，其实就是给路径对象添加更丰富的属性。</p>
+<p>然后再执行 createRouteRecordMatcher 函数，传入标准化的 record 对象，我们再来看它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">createRouteRecordMatcher</span>(<span class="hljs-params">record, parent, options</span>) &#123;
+  <span class="hljs-keyword">const</span> parser = <span class="hljs-title function_">tokensToParser</span>(<span class="hljs-title function_">tokenizePath</span>(record.<span class="hljs-property">path</span>), options);
+  &#123;
+    <span class="hljs-keyword">const</span> existingKeys = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>();
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> key <span class="hljs-keyword">of</span> parser.<span class="hljs-property">keys</span>) &#123;
+      <span class="hljs-keyword">if</span> (existingKeys.<span class="hljs-title function_">has</span>(key.<span class="hljs-property">name</span>))
+        <span class="hljs-title function_">warn</span>(
+          <span class="hljs-string">`Found duplicated params with name &quot;<span class="hljs-subst">$&#123;key.name&#125;</span>&quot; for path &quot;<span class="hljs-subst">$&#123;record.path&#125;</span>&quot;. Only the last one will be available on &quot;$route.params&quot;.`</span>
+        );
+      existingKeys.<span class="hljs-title function_">add</span>(key.<span class="hljs-property">name</span>);
+    &#125;
+  &#125;
+  <span class="hljs-keyword">const</span> matcher = <span class="hljs-title function_">assign</span>(parser, &#123;
+    record,
+    parent,
+    <span class="hljs-attr">children</span>: [],
+    <span class="hljs-attr">alias</span>: [],
+  &#125;);
+  <span class="hljs-keyword">if</span> (parent) &#123;
+    <span class="hljs-keyword">if</span> (!matcher.<span class="hljs-property">record</span>.<span class="hljs-property">aliasOf</span> === !parent.<span class="hljs-property">record</span>.<span class="hljs-property">aliasOf</span>)
+      parent.<span class="hljs-property">children</span>.<span class="hljs-title function_">push</span>(matcher);
+  &#125;
+  <span class="hljs-keyword">return</span> matcher;
+&#125;</code></pre>
+<p>其实 createRouteRecordMatcher 创建的 matcher 对象不仅仅拥有 record 属性来存储 record，还扩展了一些其他属性，需要注意，如果存在 parent matcher，那么会把当前 matcher 添加到 parent.children 中去，这样就维护了父子关系，构造了树形结构。</p>
+<p>那么什么情况下会有 parent matcher 呢？让我们先回到 addRoute 函数，在创建了 matcher 对象后，接着判断 record 中是否有 children 属性，如果有则遍历 children，递归执行 addRoute 方法添加路径，并把创建 matcher 作为第二个参数 parent 传入，这也就是 parent matcher 存在的原因。</p>
+<p>所有 children 处理完毕后，再执行 insertMatcher 函数，把创建的 matcher 存入到 matchers 数组中。</p>
+<p>至此，我们就根据用户配置的 routes 路径数组，初始化好了 matchers 数组。</p>
+<p>那么再回到我们前面的问题，分析路径对象中的 matched 的值是怎么在路径切换的情况下更新的。</p>
+<p>之前我们提到过，切换路径会执行 pushWithRedirect 方法，内部会执行一段代码：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> targetLocation = (pendingLocation = <span class="hljs-title function_">resolve</span>(to));</code></pre>
+<p>这里会执行 resolve 函数解析生成 targetLocation，这个 targetLocation 最后也会在 finalizeNavigation 的时候赋值 currentRoute 更新当前路径。我们来看 resolve 函数的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">location, currentLocation</span>) &#123;
+  <span class="hljs-keyword">let</span> matcher;
+  <span class="hljs-keyword">let</span> params = &#123;&#125;;
+  <span class="hljs-keyword">let</span> path;
+  <span class="hljs-keyword">let</span> name;
+  <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;name&quot;</span> <span class="hljs-keyword">in</span> location &amp;&amp; location.<span class="hljs-property">name</span>) &#123;
+    matcher = matcherMap.<span class="hljs-title function_">get</span>(location.<span class="hljs-property">name</span>);
+    <span class="hljs-keyword">if</span> (!matcher)
+      <span class="hljs-keyword">throw</span> <span class="hljs-title function_">createRouterError</span>(<span class="hljs-number">1</span> <span class="hljs-comment">/* MATCHER_NOT_FOUND */</span>, &#123;
+        location,
+      &#125;);
+    name = matcher.<span class="hljs-property">record</span>.<span class="hljs-property">name</span>;
+    params = <span class="hljs-title function_">assign</span>(
+      <span class="hljs-title function_">paramsFromLocation</span>(
+        currentLocation.<span class="hljs-property">params</span>,
+        matcher.<span class="hljs-property">keys</span>.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">k</span>) =&gt;</span> !k.<span class="hljs-property">optional</span>).<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">k</span>) =&gt;</span> k.<span class="hljs-property">name</span>)
+      ),
+      location.<span class="hljs-property">params</span>
+    );
+    path = matcher.<span class="hljs-title function_">stringify</span>(params);
+  &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;path&quot;</span> <span class="hljs-keyword">in</span> location) &#123;
+    path = location.<span class="hljs-property">path</span>;
+    <span class="hljs-keyword">if</span> (!path.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&quot;/&quot;</span>)) &#123;
+      <span class="hljs-title function_">warn</span>(
+        <span class="hljs-string">`The Matcher cannot resolve relative paths but received &quot;<span class="hljs-subst">$&#123;path&#125;</span>&quot;. Unless you directly called \`matcher.resolve(&quot;<span class="hljs-subst">$&#123;path&#125;</span>&quot;)\`, this is probably a bug in vue-router. Please open an issue at https://new-issue.vuejs.org/?repo=vuejs/vue-router-next.`</span>
+      );
+    &#125;
+    matcher = matchers.<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> m.<span class="hljs-property">re</span>.<span class="hljs-title function_">test</span>(path));
+
+    <span class="hljs-keyword">if</span> (matcher) &#123;
+      params = matcher.<span class="hljs-title function_">parse</span>(path);
+      name = matcher.<span class="hljs-property">record</span>.<span class="hljs-property">name</span>;
+    &#125;
+  &#125; <span class="hljs-keyword">else</span> &#123;
+    matcher = currentLocation.<span class="hljs-property">name</span>
+      ? matcherMap.<span class="hljs-title function_">get</span>(currentLocation.<span class="hljs-property">name</span>)
+      : matchers.<span class="hljs-title function_">find</span>(<span class="hljs-function">(<span class="hljs-params">m</span>) =&gt;</span> m.<span class="hljs-property">re</span>.<span class="hljs-title function_">test</span>(currentLocation.<span class="hljs-property">path</span>));
+    <span class="hljs-keyword">if</span> (!matcher)
+      <span class="hljs-keyword">throw</span> <span class="hljs-title function_">createRouterError</span>(<span class="hljs-number">1</span> <span class="hljs-comment">/* MATCHER_NOT_FOUND */</span>, &#123;
+        location,
+        currentLocation,
+      &#125;);
+    name = matcher.<span class="hljs-property">record</span>.<span class="hljs-property">name</span>;
+    params = <span class="hljs-title function_">assign</span>(&#123;&#125;, currentLocation.<span class="hljs-property">params</span>, location.<span class="hljs-property">params</span>);
+    path = matcher.<span class="hljs-title function_">stringify</span>(params);
+  &#125;
+  <span class="hljs-keyword">const</span> matched = [];
+  <span class="hljs-keyword">let</span> parentMatcher = matcher;
+  <span class="hljs-keyword">while</span> (parentMatcher) &#123;
+    matched.<span class="hljs-title function_">unshift</span>(parentMatcher.<span class="hljs-property">record</span>);
+    parentMatcher = parentMatcher.<span class="hljs-property">parent</span>;
+  &#125;
+  <span class="hljs-keyword">return</span> &#123;
+    name,
+    path,
+    params,
+    matched,
+    <span class="hljs-attr">meta</span>: <span class="hljs-title function_">mergeMetaFields</span>(matched),
+  &#125;;
+&#125;</code></pre>
+<p>resolve 函数主要做的事情就是根据 location 的 name 或者 path 从我们前面创建的 matchers 数组中找到对应的 matcher，然后再顺着 matcher 的 parent 一直找到链路上所有匹配的 matcher，然后获取其中的 record 属性构造成一个 matched 数组，最终返回包含 matched 属性的新的路径对象。</p>
+<p>这么做的目的就是让 matched 数组完整记录 record 路径，它的顺序和嵌套的 RouterView 组件顺序一致，也就是 matched 数组中的第 n 个元素就代表着 RouterView 嵌套的第 n 层。</p>
+<p>因此 targetLocation 和 to 相比，其实就是多了一个 matched 对象，这样再回到我们的 RouterView 组件，就可以从<code>injectedRoute.matched[depth] [props.name]</code>中拿到对应的组件对象定义，去渲染对应的组件了。</p>
+<p>至此，我们就搞清楚路径和路由组件的渲染是如何映射的了。</p>
+<p>前面的分析过程中，我们提到过在路径切换过程中，会执行 navigate 方法，它包含了一系列的导航守卫钩子函数的执行，接下来我们就来分析这部分的实现原理。</p>
+<h2 id="2-导航守卫的实现">2 导航守卫的实现</h2>
+<p>导航守卫主要是让用户在路径切换的生命周期中可以注入钩子函数，执行一些自己的逻辑，也可以取消和重定向导航，举个应用的例子：</p>
+<pre><code class="hljs javascript">router.<span class="hljs-title function_">beforeEach</span>(<span class="hljs-function">(<span class="hljs-params">to, <span class="hljs-keyword">from</span>, next</span>) =&gt;</span> &#123;
+  <span class="hljs-keyword">if</span> (to.<span class="hljs-property">name</span> !== <span class="hljs-string">&#x27;Login&#x27;</span> &amp;&amp; !isAuthenticated) <span class="hljs-title function_">next</span>(&#123; <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Login&#x27;</span> &#125;) <span class="hljs-keyword">else</span> &#123;
+    <span class="hljs-title function_">next</span>()
+  &#125;
+&#125;)</code></pre>
+<p>这里大致含义就是进入路由前检查用户是否登录，如果没有则跳转到登录的视图组件，否则继续。</p>
+<p>router.beforeEach 传入的参数是一个函数，我们把这类函数就称为导航守卫。</p>
+<p>那么这些导航守卫是怎么执行的呢？这里我并不打算去详细讲 navigate 实现的完整流程，而是讲清楚它的执行原理，关于导航守卫的执行顺序建议你去对照<a target="_blank" rel="noopener" href="https://next.router.vuejs.org/guide/advanced/navigation-guards.html">官网文档</a>，然后再来看实现细节。</p>
+<p>接下来，我们来看 navigate 函数的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">navigate</span>(<span class="hljs-params">to, <span class="hljs-keyword">from</span></span>) &#123;
+  <span class="hljs-keyword">let</span> guards;
+  <span class="hljs-keyword">const</span> [
+    leavingRecords,
+    updatingRecords,
+    enteringRecords,
+  ] = <span class="hljs-title function_">extractChangingRecords</span>(to, <span class="hljs-keyword">from</span>);
+  guards = <span class="hljs-title function_">extractComponentsGuards</span>(
+    leavingRecords.<span class="hljs-title function_">reverse</span>(),
+    <span class="hljs-string">&quot;beforeRouteLeave&quot;</span>,
+    to,
+    <span class="hljs-keyword">from</span>
+  );
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> record <span class="hljs-keyword">of</span> leavingRecords) &#123;
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> guard <span class="hljs-keyword">of</span> record.<span class="hljs-property">leaveGuards</span>) &#123;
+      guards.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">guardToPromiseFn</span>(guard, to, <span class="hljs-keyword">from</span>));
+    &#125;
+  &#125;
+  <span class="hljs-keyword">const</span> canceledNavigationCheck = checkCanceledNavigationAndReject.<span class="hljs-title function_">bind</span>(
+    <span class="hljs-literal">null</span>,
+    to,
+    <span class="hljs-keyword">from</span>
+  );
+  guards.<span class="hljs-title function_">push</span>(canceledNavigationCheck);
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">runGuardQueue</span>(guards)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      guards = [];
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> guard <span class="hljs-keyword">of</span> beforeGuards.<span class="hljs-title function_">list</span>()) &#123;
+        guards.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">guardToPromiseFn</span>(guard, to, <span class="hljs-keyword">from</span>));
+      &#125;
+      guards.<span class="hljs-title function_">push</span>(canceledNavigationCheck);
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">runGuardQueue</span>(guards);
+    &#125;)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      guards = <span class="hljs-title function_">extractComponentsGuards</span>(
+        updatingRecords,
+        <span class="hljs-string">&quot;beforeRouteUpdate&quot;</span>,
+        to,
+        <span class="hljs-keyword">from</span>
+      );
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> record <span class="hljs-keyword">of</span> updatingRecords) &#123;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> guard <span class="hljs-keyword">of</span> record.<span class="hljs-property">updateGuards</span>) &#123;
+          guards.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">guardToPromiseFn</span>(guard, to, <span class="hljs-keyword">from</span>));
+        &#125;
+      &#125;
+      guards.<span class="hljs-title function_">push</span>(canceledNavigationCheck);
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">runGuardQueue</span>(guards);
+    &#125;)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      guards = [];
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> record <span class="hljs-keyword">of</span> to.<span class="hljs-property">matched</span>) &#123;
+        <span class="hljs-keyword">if</span> (record.<span class="hljs-property">beforeEnter</span> &amp;&amp; <span class="hljs-keyword">from</span>.<span class="hljs-property">matched</span>.<span class="hljs-title function_">indexOf</span>(record) &lt; <span class="hljs-number">0</span>) &#123;
+          <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Array</span>.<span class="hljs-title function_">isArray</span>(record.<span class="hljs-property">beforeEnter</span>)) &#123;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> beforeEnter <span class="hljs-keyword">of</span> record.<span class="hljs-property">beforeEnter</span>)
+              guards.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">guardToPromiseFn</span>(beforeEnter, to, <span class="hljs-keyword">from</span>));
+          &#125; <span class="hljs-keyword">else</span> &#123;
+            guards.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">guardToPromiseFn</span>(record.<span class="hljs-property">beforeEnter</span>, to, <span class="hljs-keyword">from</span>));
+          &#125;
+        &#125;
+      &#125;
+      guards.<span class="hljs-title function_">push</span>(canceledNavigationCheck);
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">runGuardQueue</span>(guards);
+    &#125;)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      to.<span class="hljs-property">matched</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">record</span>) =&gt;</span> (record.<span class="hljs-property">enterCallbacks</span> = &#123;&#125;));
+      guards = <span class="hljs-title function_">extractComponentsGuards</span>(
+        enteringRecords,
+        <span class="hljs-string">&quot;beforeRouteEnter&quot;</span>,
+        to,
+        <span class="hljs-keyword">from</span>
+      );
+      guards.<span class="hljs-title function_">push</span>(canceledNavigationCheck);
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">runGuardQueue</span>(guards);
+    &#125;)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      guards = [];
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> guard <span class="hljs-keyword">of</span> beforeResolveGuards.<span class="hljs-title function_">list</span>()) &#123;
+        guards.<span class="hljs-title function_">push</span>(<span class="hljs-title function_">guardToPromiseFn</span>(guard, to, <span class="hljs-keyword">from</span>));
+      &#125;
+      guards.<span class="hljs-title function_">push</span>(canceledNavigationCheck);
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">runGuardQueue</span>(guards);
+    &#125;)
+    .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span>
+      <span class="hljs-title function_">isNavigationFailure</span>(err, <span class="hljs-number">8</span> <span class="hljs-comment">/* NAVIGATION_CANCELLED */</span>)
+        ? err
+        : <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">reject</span>(err)
+    );
+&#125;</code></pre>
+<p>可以看到 navigate 执行导航守卫的方式是先构造 guards 数组，数组中每个元素都是一个返回 Promise 对象的函数。</p>
+<p>然后通过 runGuardQueue 去执行这些 guards，来看它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">runGuardQueue</span>(<span class="hljs-params">guards</span>) &#123;
+  <span class="hljs-keyword">return</span> guards.<span class="hljs-title function_">reduce</span>(
+    <span class="hljs-function">(<span class="hljs-params">promise, guard</span>) =&gt;</span> promise.<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">guard</span>()),
+    <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>()
+  );
+&#125;</code></pre>
+<p>其实就是通过数组的 reduce 方法，链式执行 guard 函数，每个 guard 函数都会返回一个 Promise 对象。</p>
+<p>但是从我们的例子看，我们添加的是一个普通函数，并不是一个返回 Promise 对象的函数，那是怎么做的呢？</p>
+<p>原来在把 guard 添加到 guards 数组前，都会执行 guardToPromiseFn 函数把普通函数 Promise 化，来看它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">import</span> &#123; warn <span class="hljs-keyword">as</span> warn$<span class="hljs-number">1</span> &#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;vue/dist/vue&quot;</span>;
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">guardToPromiseFn</span>(<span class="hljs-params">guard, to, <span class="hljs-keyword">from</span>, record, name</span>) &#123;
+  <span class="hljs-keyword">const</span> enterCallbackArray =
+    record &amp;&amp; (record.<span class="hljs-property">enterCallbacks</span>[name] = record.<span class="hljs-property">enterCallbacks</span>[name] || []);
+  <span class="hljs-keyword">return</span> <span class="hljs-function">() =&gt;</span>
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =&gt;</span> &#123;
+      <span class="hljs-keyword">const</span> <span class="hljs-title function_">next</span> = (<span class="hljs-params">valid</span>) =&gt; &#123;
+        <span class="hljs-keyword">if</span> (valid === <span class="hljs-literal">false</span>)
+          <span class="hljs-title function_">reject</span>(
+            <span class="hljs-title function_">createRouterError</span>(<span class="hljs-number">4</span> <span class="hljs-comment">/* NAVIGATION_ABORTED */</span>, &#123;
+              <span class="hljs-keyword">from</span>,
+              to,
+            &#125;)
+          );
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (valid <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Error</span>) &#123;
+          <span class="hljs-title function_">reject</span>(valid);
+        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-title function_">isRouteLocation</span>(valid)) &#123;
+          <span class="hljs-title function_">reject</span>(
+            <span class="hljs-title function_">createRouterError</span>(<span class="hljs-number">2</span> <span class="hljs-comment">/* NAVIGATION_GUARD_REDIRECT */</span>, &#123;
+              <span class="hljs-attr">from</span>: to,
+              <span class="hljs-attr">to</span>: valid,
+            &#125;)
+          );
+        &#125; <span class="hljs-keyword">else</span> &#123;
+          <span class="hljs-keyword">if</span> (
+            enterCallbackArray &amp;&amp;
+            record.<span class="hljs-property">enterCallbacks</span>[name] === enterCallbackArray &amp;&amp;
+            <span class="hljs-keyword">typeof</span> valid === <span class="hljs-string">&quot;function&quot;</span>
+          )
+            enterCallbackArray.<span class="hljs-title function_">push</span>(valid);
+          <span class="hljs-title function_">resolve</span>();
+        &#125;
+      &#125;;
+      <span class="hljs-keyword">const</span> guardReturn = guard.<span class="hljs-title function_">call</span>(
+        record &amp;&amp; record.<span class="hljs-property">instances</span>[name],
+        to,
+        <span class="hljs-keyword">from</span>,
+        next
+      );
+      <span class="hljs-keyword">let</span> guardCall = <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(guardReturn);
+      <span class="hljs-keyword">if</span> (guard.<span class="hljs-property">length</span> &lt; <span class="hljs-number">3</span>) guardCall = guardCall.<span class="hljs-title function_">then</span>(next);
+      <span class="hljs-keyword">if</span> (guard.<span class="hljs-property">length</span> &gt; <span class="hljs-number">2</span>) &#123;
+        <span class="hljs-keyword">const</span> message = <span class="hljs-string">`The &quot;next&quot; callback was never called inside of <span class="hljs-subst">$&#123;</span></span>
+<span class="hljs-subst"><span class="hljs-string">          guard.name ? <span class="hljs-string">&#x27;&quot;&#x27;</span> + guard.name + <span class="hljs-string">&#x27;&quot;&#x27;</span> : <span class="hljs-string">&quot;&quot;</span></span></span>
+<span class="hljs-subst"><span class="hljs-string">        &#125;</span>:\n<span class="hljs-subst">$&#123;guard.toString()&#125;</span>\n. If you are returning a value instead of calling &quot;next&quot;, make sure to remove the &quot;next&quot; parameter from your function.`</span>;
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> guardReturn === <span class="hljs-string">&quot;object&quot;</span> &amp;&amp; <span class="hljs-string">&quot;then&quot;</span> <span class="hljs-keyword">in</span> guardReturn) &#123;
+          guardCall = guardCall.<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">resolvedValue</span>) =&gt;</span> &#123;
+            <span class="hljs-comment">// @ts-ignore: _called is added at canOnlyBeCalledOnce</span>
+            <span class="hljs-keyword">if</span> (!next.<span class="hljs-property">_called</span>) &#123;
+              <span class="hljs-title function_">warn$1</span>(message);
+              <span class="hljs-keyword">return</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Invalid navigation guard&quot;</span>));
+            &#125;
+            <span class="hljs-keyword">return</span> resolvedValue;
+          &#125;);
+        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (guardReturn !== <span class="hljs-literal">undefined</span>) &#123;
+          <span class="hljs-keyword">if</span> (!next.<span class="hljs-property">_called</span>) &#123;
+            <span class="hljs-title function_">warn$1</span>(message);
+            <span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Invalid navigation guard&quot;</span>));
+            <span class="hljs-keyword">return</span>;
+          &#125;
+        &#125;
+      &#125;
+      guardCall.<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> <span class="hljs-title function_">reject</span>(err));
+    &#125;);
+&#125;</code></pre>
+<p>guardToPromiseFn 函数返回一个新的函数，这个函数内部会执行 guard 函数。</p>
+<p>这里我们要注意 next 方法的设计，当我们在导航守卫中执行 next 时，实际上就是执行这里定义的 next 函数。</p>
+<p>在执行 next 函数时，如果不传参数，那么则直接 resolve，执行下一个导航守卫；如果参数是 false，则创建一个导航取消的错误 reject 出去；如果参数是一个 Error 实例，则直接执行 reject，并把错误传递出去；如果参数是一个路径对象，则创建一个导航重定向的错误传递出去。</p>
+<p>有些时候我们写导航守卫不使用 next 函数，而是直接返回 true 或 false，这种情况则先执行如下代码：</p>
+<pre><code class="hljs javascript">guardCall = <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(guardReturn);</code></pre>
+<p>把导航守卫的返回值 Promise 化，然后再执行 guardCall.then(next)，把导航守卫的返回值传给 next 函数。</p>
+<p>当然，如果你在导航守卫中定义了第三个参数 next，但是你没有在函数中调用它，这种情况也会报警告。</p>
+<p>所以，对于导航守卫而言，经过 Promise 化后添加到 guards 数组中，然后再通过 runGuards 以及 Promise 的方式链式调用，最终依次顺序执行这些导航守卫。</p>
+<h2 id="3-总结">3 总结</h2>
+<p>好的，到这里我们本篇的内容也要结束啦，通过本篇的学习，我们应该要了解 Vue Router 的基本实现原理，知道路径是如何管理的，路径和路由组件的渲染是如何映射的，导航守卫是如何执行的。</p>
+<p>当然，路由实现的细节是非常多的，我们可以对照着官网的文档的 feature，自行去分析它们的实现原理。</p>
+<p>最后，思考一个问题，如果我们想给路由组件传递数据，有几种方式，分别都怎么做呢？</p>
+ 
+      <div id="toc-article">
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%B7%AF%E5%BE%84%E5%92%8C%E8%B7%AF%E7%94%B1%E7%BB%84%E4%BB%B6%E7%9A%84%E6%B8%B2%E6%9F%93%E7%9A%84%E6%98%A0%E5%B0%84"><span class="toc-text">1 路径和路由组件的渲染的映射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%BC%E8%88%AA%E5%AE%88%E5%8D%AB%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-text">2 导航守卫的实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3 总结</span></a></li></ol>
+    </div>
+  </div>
+
+</div>
+       
+      <blockquote id="copyright">
+        <p>
+           原文链接:
+          <a href="https://jesse121.github.io/blog/articles/2021/01/27.html"
+            >https://jesse121.github.io/blog/articles/2021/01/27.html</a
+          >
+        </p>
+        <p>版权声明: 转载请注明出处.</p>
+      </blockquote>
+       
+    </div>
+    <footer class="article-footer">
+      
+      <div class="article-tag-wrap">
+        
+ 
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/vue/" rel="tag">vue</a></li></ul>
+ 
+
+
+      </div>
+        
+<nav id="article-nav">
+  
+    <a href="/blog/articles/2021/01/26.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          Vue3.0 核心源码解读 | Vue Router：如何实现一个前端路由？（上）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/articles/2021/03/04.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          递归
+        
+      </div>
+    </a>
+  
+</nav>
+   
+  <div id="comments"></div>
+
+
+
+
+
+
+
+
+ 
+    </footer>
+  </div>
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
+  <div class="widget">
+    <ul>
+       
+      <li>
+        <a href="/blog/articles/2023/06/18.html"
+          >页面添加动态水印的处理方法</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/27.html"
+          >前端项目如何自定义页面Import排序？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/20.html"
+          >图片二进制流如何在页面显示？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/15.html"
+          >如何编写Vue3组件测试用例？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/14.html"
+          >Vue3项目如何利用vitest做单元测试</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/12/18.html"
+          >《第一本Docker书》--读书笔记</a
+        >
+      </li>
+          
+      <li>
+        <a href="/blog/articles/2022/11/22.html"
+          >基于ElementPlus封装的季度选择器组件</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/11/16.html"
+          >掘金小册-Electron+Vue3桌面应用开发学习记录</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/10/29.html"
+          >如何使用Monorepo实现跨项目共享组件和模块</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/09/10.html"
+          >手写Promise思考过程</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/08.html"
+          >如何解决Electron应用安装在C盘没有权限更新的问题</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/05.html"
+          >如何用Electron+vue+vite构建桌面端应用(三)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/04.html"
+          >如何用Electron+vue+vite构建桌面端应用(二)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/22.html"
+          >从源码分析为什么Electron+vue项目中router不能用history模式</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/20.html"
+          >如何用Electron+vue+vite构建桌面端应用(一)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/06/15.html"
+          >如何在国产银河麒麟系统Mips架构上离线安装electron</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/11/28.html"
+          >《学习Javascript数据结构和算法》--读书笔记</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/10/27.html"
+          >极客时间-正则表达式</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/09/04.html"
+          >Typescript内置工具类型和操作符介绍</a
+        >
+      </li>
+       
+    </ul>
+  </div>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/angularjs/" style="font-size: 10px;">AngularJs</a> <a href="/blog/tags/apache/" style="font-size: 12.22px;">Apache</a> <a href="/blog/tags/arraybuffer/" style="font-size: 10px;">ArrayBuffer</a> <a href="/blog/tags/axios/" style="font-size: 10px;">Axios</a> <a href="/blog/tags/blob/" style="font-size: 10px;">Blob</a> <a href="/blog/tags/bootstrap/" style="font-size: 12.22px;">Bootstrap</a> <a href="/blog/tags/css/" style="font-size: 16.67px;">CSS</a> <a href="/blog/tags/canvas/" style="font-size: 10px;">Canvas</a> <a href="/blog/tags/centos/" style="font-size: 10px;">CentOS</a> <a href="/blog/tags/charles/" style="font-size: 10px;">Charles</a> <a href="/blog/tags/docker/" style="font-size: 13.33px;">Docker</a> <a href="/blog/tags/elementplus/" style="font-size: 10px;">ElementPlus</a> <a href="/blog/tags/eslint/" style="font-size: 10px;">Eslint</a> <a href="/blog/tags/git/" style="font-size: 11.11px;">Git</a> <a href="/blog/tags/gitlab/" style="font-size: 10px;">Gitlab</a> <a href="/blog/tags/gulp/" style="font-size: 10px;">Gulp</a> <a href="/blog/tags/html/" style="font-size: 12.22px;">HTML</a> <a href="/blog/tags/html5/" style="font-size: 10px;">HTML5</a> <a href="/blog/tags/http/" style="font-size: 12.22px;">HTTP</a> <a href="/blog/tags/https/" style="font-size: 10px;">HTTPS</a> <a href="/blog/tags/husky/" style="font-size: 10px;">Husky</a> <a href="/blog/tags/javascript/" style="font-size: 18.89px;">JavaScript</a> <a href="/blog/tags/jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/blog/tags/linux/" style="font-size: 11.11px;">Linux</a> <a href="/blog/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/blog/tags/mutationobserver/" style="font-size: 10px;">MutationObserver</a> <a href="/blog/tags/mysql/" style="font-size: 12.22px;">MySQL</a> <a href="/blog/tags/nginx/" style="font-size: 11.11px;">Nginx</a> <a href="/blog/tags/node-js/" style="font-size: 11.11px;">Node.js</a> <a href="/blog/tags/php/" style="font-size: 14.44px;">PHP</a> <a href="/blog/tags/photoshop/" style="font-size: 10px;">Photoshop</a> <a href="/blog/tags/react/" style="font-size: 10px;">React</a> <a href="/blog/tags/redux/" style="font-size: 10px;">Redux</a> <a href="/blog/tags/regexp/" style="font-size: 10px;">Regexp</a> <a href="/blog/tags/sse/" style="font-size: 10px;">SSE</a> <a href="/blog/tags/sublimetext3/" style="font-size: 10px;">SublimeText3</a> <a href="/blog/tags/svg/" style="font-size: 10px;">Svg</a> <a href="/blog/tags/typescript/" style="font-size: 13.33px;">Typescript</a> <a href="/blog/tags/vagrant/" style="font-size: 10px;">Vagrant</a> <a href="/blog/tags/vim/" style="font-size: 10px;">Vim</a> <a href="/blog/tags/vitest/" style="font-size: 11.11px;">Vitest</a> <a href="/blog/tags/vue/" style="font-size: 10px;">Vue</a> <a href="/blog/tags/vue3/" style="font-size: 14.44px;">Vue3</a> <a href="/blog/tags/web/" style="font-size: 14.44px;">WEB</a> <a href="/blog/tags/webpack/" style="font-size: 12.22px;">Webpack</a> <a href="/blog/tags/wireshark/" style="font-size: 11.11px;">Wireshark</a> <a href="/blog/tags/yii/" style="font-size: 10px;">Yii</a> <a href="/blog/tags/electron/" style="font-size: 15.56px;">electron</a> <a href="/blog/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/blog/tags/jquery/" style="font-size: 12.22px;">jQuery</a> <a href="/blog/tags/kylin/" style="font-size: 10px;">kylin</a> <a href="/blog/tags/monorepo/" style="font-size: 10px;">monorepo</a> <a href="/blog/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/blog/tags/vite/" style="font-size: 13.33px;">vite</a> <a href="/blog/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/blog/tags/vue/" style="font-size: 20px;">vue</a> <a href="/blog/tags/vue3/" style="font-size: 13.33px;">vue3</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">前端监控</a> <a href="/blog/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/" style="font-size: 10px;">微信小程序</a> <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 17.78px;">数据结构</a> <a href="/blog/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.78px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/bootstrap/">Bootstrap</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/electron/">Electron</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html-css/">HTML-CSS</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html5/">HTML5</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/javascript/">JavaScript</a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/mysql/">MySQL</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/node-js/">Node.js</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/php/">PHP</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/photoshop/">Photoshop</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/regexp/">Regexp</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/typescript/">Typescript</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/vue3/">Vue3</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/web/">WEB</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/jquery/">jQuery</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%85%B6%E4%BB%96/">其他</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/translation/">前端翻译</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">开发问题记录</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E7%AE%97%E6%B3%95/">算法</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/notes/">读书笔记</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2023/">2023年</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2022/">2022年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2021/">2021年</a><span class="archive-list-count">40</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/">2020年</a><span class="archive-list-count">20</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/">2019年</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/">2018年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/">2017年</a><span class="archive-list-count">26</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/">2016年</a><span class="archive-list-count">27</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-link"></i> 收藏</h3>
+    <div class="widget">
+      <ul>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.mahaixiang.cn/internet/300.html">深入理解互联网协议的原理</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://javascript.ruanyifeng.com/">JavaScript 标准参考教程</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7131211363493347335">JavaScript代码优化之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7224382896626778172">简述 js 的代码整洁之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.eggcake.cn/posts/2020-12-19-vue3-core-source-code-0">Vue3.0核心源码解读</a>
+        </li>
+      
+      </ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <a id="totop" href="#top"></a>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <p>
+        <a href="/blog/sitemap.xml">网站地图</a>
+        <span> | </span
+        ><a href="/blog/atom.xml">订阅本站</a>
+        <span> | </span
+        ><a href="/blog/about/">联系博主</a>
+      </p>
+      
+      <p>
+        <i class="fa fa-visitors"></i>
+        <i id="busuanzi_container_site_uv"
+          ><i id="busuanzi_value_site_uv"></i
+        ></i>
+        ，
+        <i class="fa fa-views"></i>
+        <i id="busuanzi_container_site_pv"
+          ><i id="busuanzi_value_site_pv"></i
+        ></i>
+      </p>
+      
+      <p>
+        <span
+          >Copyright &copy; 2026 Jesse.</span
+        >
+        <span
+          >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span
+        >
+      </p>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+  
+<script src="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+
+<script>
+  hljs.highlightAll();
+</script>
+
+<script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+<script src="/blog/js/search.json.js"></script>
+  
+<script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+ 
+<script src="/blog/js/script.js"></script>
+ 
+ 
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?8e59984317ab1777a88e5b3e62c7c767";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+  
+<script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+      
+<script src="https://unpkg.com/gitalk@1.7.2/dist/gitalk.min.js"></script>
+ 
+<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: "3c3e422527fd3f9fa17a",
+    clientSecret: "f28d1808ec9ab69fb24dc3e9fad81e1c3ab8dd83",
+    repo: "blog",
+    owner: "jesse121",
+    admin: ["jesse121"],
+    id: md5(window.location.pathname),
+    proxy: "https://stormy-gorge-51623.herokuapp.com/https://github.com/login/oauth/access_token",
+    distractionFreeMode: false,
+    language: "zh-CN",
+    body: "欢迎在下方提出问题，您的疑问促进我们共同进步！",
+    pagerDirection: "last",
+  });
+  gitalk.render("comments");
+</script>
+         
+ 
+<script
+  type="text/javascript"
+  src="https://unpkg.com/clipboard@2.0.4/dist/clipboard.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="/blog/js/codeBlock/codeBlockFunction.js"
+></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeLang.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeCopy.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeShrink.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+   
+  <title>Vue3.0 核心源码解读 | Transition 组件：过渡动画的实现原理是怎样的？（下） | 前端之路</title>
+  <meta name="theme-color" content="#bccddd" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <meta name="description" content="专注前端开发，前端开发技术博客" />
+   
+  <meta name="keywords" content="Web前端开发，Javascript，前端开发博客" />
+  
+  <link rel="dns-prefetch" href="https://unpkg.com" />
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info" />
+   <link rel="alternate" href="/blog/atom.xml" title="前端之路" type="application/atom+xml">   <link rel="shortcut icon" href="/blog/favicon.ico"> 
+  <link rel="bookmark" href="/blog/favicon.ico" />
+  <link rel="apple-touch-icon" href="/blog/apple-touch-icon.png" />
+  <link rel="apple-touch-icon-precomposed" href="/blog/apple-touch-icon.png" />
+   
+<link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/xt256.min.css">
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+  
+<link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+    
+<link rel="stylesheet" href="https://unpkg.com/gitalk@1.7.2/dist/gitalk.css">
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">前端之路</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">路漫漫其修远兮，吾将上下而求索</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/blog/."><i class="fa fa-home"></i> 首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives/"><i class="fa fa-archive"></i> 归档</a>
+        
+          <a class="main-nav-link" href="/blog/about/"><i class="fa fa-user"></i> 关于</a>
+        
+      </nav>
+    </div>
+    <div id="search-form">
+      <div id="result-mask" class="hide"></div>
+      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
+      <div id="result-wrap" class="hide">
+        <div id="search-result"></div>
+      </div>
+      <div class="hide">
+        <template id="search-tpl">
+          <div class="item">
+            <a href="/{path}" title="{title}">
+              <div class="title">{title}</div>
+              <div class="time">{date}</div>
+              <div class="tags">{tags}</div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><style>
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    /* font-size: 0.91rem; */
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  pre code {
+    padding: 0 !important;
+    color: #e8eaf6;
+    background-color: #272822;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+  .line-numbers-rows {
+    border-right-width: 0px !important;
+  }
+
+  .line-numbers {
+    padding: 1.5rem 1.5rem 1.5rem 3.2rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre {
+    padding: 1.5rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre::before {
+    content: "";
+    height: 16px;
+    margin-bottom: 0;
+    display: block;
+  }
+
+  pre::after {
+    content: " ";
+    position: absolute;
+    border-radius: 50%;
+    background: #ff5f56;
+    width: 12px;
+    height: 12px;
+    top: 0;
+    left: 12px;
+    margin-top: 12px;
+    -webkit-box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+    box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+  }
+
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    font-size: 0.91rem;
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  .code_copy {
+    position: absolute;
+    top: 0.7rem;
+    right: 35px;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code_lang {
+    position: absolute;
+    top: 1.2rem;
+    right: 60px;
+    line-height: 0;
+    font-weight: bold;
+    font-family: normal;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code-expand {
+    position: absolute;
+    top: 4px;
+    right: 0px;
+    filter: invert(50%);
+    padding: 7px 10px;
+    z-index: 1;
+    cursor: pointer;
+    transition: all 0.3s;
+    transform: rotate(0deg);
+  }
+
+  .code-closed .code-expand {
+    transform: rotate(-180deg) !important;
+    transition: all 0.3s;
+  }
+
+  .code-closed pre::before {
+    height: 0px;
+  }
+
+  pre code {
+    padding: 0;
+    color: #e8eaf6;
+    background-color: #272822 !important;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+</style>
+<article
+  id="post-vue3/2021-01-25-vue3-core-source-code-25"
+  class="h-entry article article-type-post"
+  itemprop="blogPost"
+  itemscope
+  itemtype="https://schema.org/BlogPosting"
+>
+  <div class="article-inner">
+     
+    <header class="article-header">
+      
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Vue3.0 核心源码解读 | Transition 组件：过渡动画的实现原理是怎样的？（下）
+    </h1>
+  
+
+
+    </header>
+    
+    <div class="article-meta">
+       <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2021-01-25T02:30:00.000Z" itemprop="datePublished">2021年01月25日</time>
+</span>   <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+  
+<a href="/blog/articles/2021/01/25.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+       <blockquote>
+<p>纸上得来终觉浅，绝知此事要躬行。</p>
+</blockquote>
+<p>上一篇，我们已经知道了，Vue.js 提供了内置的 Transition 组件帮我们实现动画过渡效果。在之前的分析中我把 Transition 组件的实现分成了三个部分：组件的渲染、钩子函数的执行、模式的应用。本篇我们从钩子函数的执行继续探究 Transition 组件的实现原理。</p>
+<h2 id="1-钩子函数的执行">1 钩子函数的执行</h2>
+<p>这个部分我们先来看 beforeEnter 钩子函数。</p>
+<p>在 patch 阶段的 mountElement 函数中，在插入元素节点前且存在过渡的条件下会执行 vnode.transition 中的 beforeEnter 函数，我们来看它的定义：</p>
+<pre><code class="hljs javascript"><span class="hljs-title function_">beforeEnter</span>(<span class="hljs-params">el</span>) &#123;
+  <span class="hljs-keyword">let</span> hook = onBeforeEnter
+  <span class="hljs-keyword">if</span> (!state.<span class="hljs-property">isMounted</span>) &#123;
+    <span class="hljs-keyword">if</span> (appear) &#123;
+      hook = onBeforeAppear || onBeforeEnter
+    &#125;
+    <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-keyword">return</span>
+    &#125;
+  &#125;
+  <span class="hljs-keyword">if</span> (el.<span class="hljs-property">_leaveCb</span>) &#123;
+    el.<span class="hljs-title function_">_leaveCb</span>(<span class="hljs-literal">true</span> <span class="hljs-comment">/* cancelled */</span>)
+  &#125;
+  <span class="hljs-keyword">const</span> leavingVNode = leavingVNodesCache[key]
+  <span class="hljs-keyword">if</span> (leavingVNode &amp;&amp;
+    <span class="hljs-title function_">isSameVNodeType</span>(vnode, leavingVNode) &amp;&amp;
+    leavingVNode.<span class="hljs-property">el</span>.<span class="hljs-property">_leaveCb</span>) &#123;
+    leavingVNode.<span class="hljs-property">el</span>.<span class="hljs-title function_">_leaveCb</span>()
+  &#125;
+  <span class="hljs-title function_">callHook</span>(hook, [el])
+&#125;</code></pre>
+<p>beforeEnter 钩子函数主要做的事情就是根据 appear 的值和 DOM 是否挂载，来执行 onBeforeEnter 函数或者是 onBeforeAppear 函数，其他的逻辑我们暂时先不看。</p>
+<p>appear、onBeforeEnter、onBeforeAppear 这些变量都是从 props 中获取的，那么这些 props 是怎么初始化的呢？回到 Transition 组件的定义：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Transition</span> = (<span class="hljs-params">props, &#123; slots &#125;</span>) =&gt;
+  <span class="hljs-title function_">h</span>(<span class="hljs-title class_">BaseTransition</span>, <span class="hljs-title function_">resolveTransitionProps</span>(props), slots);</code></pre>
+<p>可以看到，传递的 props 经过了 resolveTransitionProps 函数的封装，我们来看它的定义：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">resolveTransitionProps</span>(<span class="hljs-params">rawProps</span>) &#123;
+  <span class="hljs-keyword">let</span> &#123;
+    name = <span class="hljs-string">&quot;v&quot;</span>,
+    type,
+    css = <span class="hljs-literal">true</span>,
+    duration,
+    enterFromClass = <span class="hljs-string">`<span class="hljs-subst">$&#123;name&#125;</span>-enter-from`</span>,
+    enterActiveClass = <span class="hljs-string">`<span class="hljs-subst">$&#123;name&#125;</span>-enter-active`</span>,
+    enterToClass = <span class="hljs-string">`<span class="hljs-subst">$&#123;name&#125;</span>-enter-to`</span>,
+    appearFromClass = enterFromClass,
+    appearActiveClass = enterActiveClass,
+    appearToClass = enterToClass,
+    leaveFromClass = <span class="hljs-string">`<span class="hljs-subst">$&#123;name&#125;</span>-leave-from`</span>,
+    leaveActiveClass = <span class="hljs-string">`<span class="hljs-subst">$&#123;name&#125;</span>-leave-active`</span>,
+    leaveToClass = <span class="hljs-string">`<span class="hljs-subst">$&#123;name&#125;</span>-leave-to`</span>,
+  &#125; = rawProps;
+  <span class="hljs-keyword">const</span> baseProps = &#123;&#125;;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> key <span class="hljs-keyword">in</span> rawProps) &#123;
+    <span class="hljs-keyword">if</span> (!(key <span class="hljs-keyword">in</span> <span class="hljs-title class_">DOMTransitionPropsValidators</span>)) &#123;
+      baseProps[key] = rawProps[key];
+    &#125;
+  &#125;
+  <span class="hljs-keyword">if</span> (!css) &#123;
+    <span class="hljs-keyword">return</span> baseProps;
+  &#125;
+  <span class="hljs-keyword">const</span> durations = <span class="hljs-title function_">normalizeDuration</span>(duration);
+  <span class="hljs-keyword">const</span> enterDuration = durations &amp;&amp; durations[<span class="hljs-number">0</span>];
+  <span class="hljs-keyword">const</span> leaveDuration = durations &amp;&amp; durations[<span class="hljs-number">1</span>];
+  <span class="hljs-keyword">const</span> &#123;
+    onBeforeEnter,
+    onEnter,
+    onEnterCancelled,
+    onLeave,
+    onLeaveCancelled,
+    onBeforeAppear = onBeforeEnter,
+    onAppear = onEnter,
+    onAppearCancelled = onEnterCancelled,
+  &#125; = baseProps;
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">finishEnter</span> = (<span class="hljs-params">el, isAppear, done</span>) =&gt; &#123;
+    <span class="hljs-title function_">removeTransitionClass</span>(el, isAppear ? appearToClass : enterToClass);
+    <span class="hljs-title function_">removeTransitionClass</span>(el, isAppear ? appearActiveClass : enterActiveClass);
+    done &amp;&amp; <span class="hljs-title function_">done</span>();
+  &#125;;
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">finishLeave</span> = (<span class="hljs-params">el, done</span>) =&gt; &#123;
+    <span class="hljs-title function_">removeTransitionClass</span>(el, leaveToClass);
+    <span class="hljs-title function_">removeTransitionClass</span>(el, leaveActiveClass);
+    done &amp;&amp; <span class="hljs-title function_">done</span>();
+  &#125;;
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">makeEnterHook</span> = (<span class="hljs-params">isAppear</span>) =&gt; &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">el, done</span>) =&gt;</span> &#123;
+      <span class="hljs-keyword">const</span> hook = isAppear ? onAppear : onEnter;
+      <span class="hljs-keyword">const</span> <span class="hljs-title function_">resolve</span> = (<span class="hljs-params"></span>) =&gt; <span class="hljs-title function_">finishEnter</span>(el, isAppear, done);
+      hook &amp;&amp; <span class="hljs-title function_">hook</span>(el, resolve);
+      <span class="hljs-title function_">nextFrame</span>(<span class="hljs-function">() =&gt;</span> &#123;
+        <span class="hljs-title function_">removeTransitionClass</span>(el, isAppear ? appearFromClass : enterFromClass);
+        <span class="hljs-title function_">addTransitionClass</span>(el, isAppear ? appearToClass : enterToClass);
+        <span class="hljs-keyword">if</span> (!(hook &amp;&amp; hook.<span class="hljs-property">length</span> &gt; <span class="hljs-number">1</span>)) &#123;
+          <span class="hljs-keyword">if</span> (enterDuration) &#123;
+            <span class="hljs-built_in">setTimeout</span>(resolve, enterDuration);
+          &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-title function_">whenTransitionEnds</span>(el, type, resolve);
+          &#125;
+        &#125;
+      &#125;);
+    &#125;;
+  &#125;;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">extend</span>(baseProps, &#123;
+    <span class="hljs-title function_">onBeforeEnter</span>(<span class="hljs-params">el</span>) &#123;
+      onBeforeEnter &amp;&amp; <span class="hljs-title function_">onBeforeEnter</span>(el);
+      <span class="hljs-title function_">addTransitionClass</span>(el, enterActiveClass);
+      <span class="hljs-title function_">addTransitionClass</span>(el, enterFromClass);
+    &#125;,
+    <span class="hljs-title function_">onBeforeAppear</span>(<span class="hljs-params">el</span>) &#123;
+      onBeforeAppear &amp;&amp; <span class="hljs-title function_">onBeforeAppear</span>(el);
+      <span class="hljs-title function_">addTransitionClass</span>(el, appearActiveClass);
+      <span class="hljs-title function_">addTransitionClass</span>(el, appearFromClass);
+    &#125;,
+    <span class="hljs-attr">onEnter</span>: <span class="hljs-title function_">makeEnterHook</span>(<span class="hljs-literal">false</span>),
+    <span class="hljs-attr">onAppear</span>: <span class="hljs-title function_">makeEnterHook</span>(<span class="hljs-literal">true</span>),
+    <span class="hljs-title function_">onLeave</span>(<span class="hljs-params">el, done</span>) &#123;
+      <span class="hljs-keyword">const</span> <span class="hljs-title function_">resolve</span> = (<span class="hljs-params"></span>) =&gt; <span class="hljs-title function_">finishLeave</span>(el, done);
+      <span class="hljs-title function_">addTransitionClass</span>(el, leaveActiveClass);
+      <span class="hljs-title function_">addTransitionClass</span>(el, leaveFromClass);
+      <span class="hljs-title function_">nextFrame</span>(<span class="hljs-function">() =&gt;</span> &#123;
+        <span class="hljs-title function_">removeTransitionClass</span>(el, leaveFromClass);
+        <span class="hljs-title function_">addTransitionClass</span>(el, leaveToClass);
+        <span class="hljs-keyword">if</span> (!(onLeave &amp;&amp; onLeave.<span class="hljs-property">length</span> &gt; <span class="hljs-number">1</span>)) &#123;
+          <span class="hljs-keyword">if</span> (leaveDuration) &#123;
+            <span class="hljs-built_in">setTimeout</span>(resolve, leaveDuration);
+          &#125; <span class="hljs-keyword">else</span> &#123;
+            <span class="hljs-title function_">whenTransitionEnds</span>(el, type, resolve);
+          &#125;
+        &#125;
+      &#125;);
+      onLeave &amp;&amp; <span class="hljs-title function_">onLeave</span>(el, resolve);
+    &#125;,
+    <span class="hljs-title function_">onEnterCancelled</span>(<span class="hljs-params">el</span>) &#123;
+      <span class="hljs-title function_">finishEnter</span>(el, <span class="hljs-literal">false</span>);
+      onEnterCancelled &amp;&amp; <span class="hljs-title function_">onEnterCancelled</span>(el);
+    &#125;,
+    <span class="hljs-title function_">onAppearCancelled</span>(<span class="hljs-params">el</span>) &#123;
+      <span class="hljs-title function_">finishEnter</span>(el, <span class="hljs-literal">true</span>);
+      onAppearCancelled &amp;&amp; <span class="hljs-title function_">onAppearCancelled</span>(el);
+    &#125;,
+    <span class="hljs-title function_">onLeaveCancelled</span>(<span class="hljs-params">el</span>) &#123;
+      <span class="hljs-title function_">finishLeave</span>(el);
+      onLeaveCancelled &amp;&amp; <span class="hljs-title function_">onLeaveCancelled</span>(el);
+    &#125;,
+  &#125;);
+&#125;</code></pre>
+<p>resolveTransitionProps 函数主要作用是，在我们给 Transition 传递的 Props 基础上做一层封装，然后返回一个新的 Props 对象，由于它包含了所有的 Props 处理，你不需要一下子了解所有的实现，按需分析即可。</p>
+<p>我们来看 onBeforeEnter 函数，它的内部执行了基础 props 传入的 onBeforeEnter 钩子函数，并且给 DOM 元素 el 添加了 enterActiveClass 和 enterFromClass 样式。</p>
+<p>其中，props 传入的 onBeforeEnter 函数就是我们写 Transition 组件时添加的 beforeEnter 钩子函数。enterActiveClass 默认值是 v-enter-active，enterFromClass 默认值是 v-enter-from，如果给 Transition 组件传入了 name 的 prop，比如 fade，那么 enterActiveClass 的值就是 fade-enter-active，enterFromClass 的值就是 fade-enter-from。</p>
+<p>原来这就是在 DOM 元素对象在创建后，插入到页面前做的事情：<strong>执行 beforeEnter 钩子函数，以及给元素添加相应的 CSS 样式</strong>。</p>
+<p>onBeforeAppear 和 onBeforeEnter 的逻辑类似，就不赘述了，它是在我们给 Transition 组件传入 appear 的 Prop，且首次挂载的时候执行的。</p>
+<p>执行完 beforeEnter 钩子函数，接着插入元素到页面，然后会执行 vnode.transition 中的 enter 钩子函数，我们来看它的定义：</p>
+<pre><code class="hljs javascript"><span class="hljs-title function_">enter</span>(<span class="hljs-params">el</span>) &#123;
+  <span class="hljs-keyword">let</span> hook = onEnter
+  <span class="hljs-keyword">let</span> afterHook = onAfterEnter
+  <span class="hljs-keyword">let</span> cancelHook = onEnterCancelled
+  <span class="hljs-keyword">if</span> (!state.<span class="hljs-property">isMounted</span>) &#123;
+    <span class="hljs-keyword">if</span> (appear) &#123;
+      hook = onAppear || onEnter
+      afterHook = onAfterAppear || onAfterEnter
+      cancelHook = onAppearCancelled || onEnterCancelled
+    &#125;
+    <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-keyword">return</span>
+    &#125;
+  &#125;
+  <span class="hljs-keyword">let</span> called = <span class="hljs-literal">false</span>
+  <span class="hljs-keyword">const</span> done = (el.<span class="hljs-property">_enterCb</span> = <span class="hljs-function">(<span class="hljs-params">cancelled</span>) =&gt;</span> &#123;
+    <span class="hljs-keyword">if</span> (called)
+      <span class="hljs-keyword">return</span>
+    called = <span class="hljs-literal">true</span>
+    <span class="hljs-keyword">if</span> (cancelled) &#123;
+      <span class="hljs-title function_">callHook</span>(cancelHook, [el])
+    &#125;
+    <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-title function_">callHook</span>(afterHook, [el])
+    &#125;
+    <span class="hljs-keyword">if</span> (hooks.<span class="hljs-property">delayedLeave</span>) &#123;
+      hooks.<span class="hljs-title function_">delayedLeave</span>()
+    &#125;
+    el.<span class="hljs-property">_enterCb</span> = <span class="hljs-literal">undefined</span>
+  &#125;)
+  <span class="hljs-keyword">if</span> (hook) &#123;
+    <span class="hljs-title function_">hook</span>(el, done)
+    <span class="hljs-keyword">if</span> (hook.<span class="hljs-property">length</span> &lt;= <span class="hljs-number">1</span>) &#123;
+      <span class="hljs-title function_">done</span>()
+    &#125;
+  &#125;
+  <span class="hljs-keyword">else</span> &#123;
+    <span class="hljs-title function_">done</span>()
+  &#125;
+&#125;</code></pre>
+<p>enter 钩子函数主要做的事情就是根据 appear 的值和 DOM 是否挂载，执行 onEnter 函数或者是 onAppear 函数，并且这个函数的第二个参数是一个 done 函数，表示过渡动画完成后执行的回调函数，它是异步执行的。</p>
+<blockquote>
+<p>注意，当 onEnter 或者 onAppear 函数的参数长度小于等于 1 的时候，done 函数在执行完 hook 函数后同步执行。</p>
+</blockquote>
+<p>在 done 函数的内部，我们会执行 onAfterEnter 函数或者是 onEnterCancelled 函数，其它的逻辑我们也暂时先不看。</p>
+<p>同理，onEnter、onAppear、onAfterEnter 和 onEnterCancelled 函数也是从 Props 传入的，我们重点看 onEnter 的实现，它是 makeEnterHook(false) 函数执行后的返回值，如下：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">makeEnterHook</span> = (<span class="hljs-params">isAppear</span>) =&gt; &#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-function">(<span class="hljs-params">el, done</span>) =&gt;</span> &#123;
+    <span class="hljs-keyword">const</span> hook = isAppear ? onAppear : onEnter;
+    <span class="hljs-keyword">const</span> <span class="hljs-title function_">resolve</span> = (<span class="hljs-params"></span>) =&gt; <span class="hljs-title function_">finishEnter</span>(el, isAppear, done);
+    hook &amp;&amp; <span class="hljs-title function_">hook</span>(el, resolve);
+    <span class="hljs-title function_">nextFrame</span>(<span class="hljs-function">() =&gt;</span> &#123;
+      <span class="hljs-title function_">removeTransitionClass</span>(el, isAppear ? appearFromClass : enterFromClass);
+      <span class="hljs-title function_">addTransitionClass</span>(el, isAppear ? appearToClass : enterToClass);
+      <span class="hljs-keyword">if</span> (!(hook &amp;&amp; hook.<span class="hljs-property">length</span> &gt; <span class="hljs-number">1</span>)) &#123;
+        <span class="hljs-keyword">if</span> (enterDuration) &#123;
+          <span class="hljs-built_in">setTimeout</span>(resolve, enterDuration);
+        &#125; <span class="hljs-keyword">else</span> &#123;
+          <span class="hljs-title function_">whenTransitionEnds</span>(el, type, resolve);
+        &#125;
+      &#125;
+    &#125;);
+  &#125;;
+&#125;;</code></pre>
+<p>在函数内部，首先执行基础 props 传入的 onEnter 钩子函数，然后在下一帧给 DOM 元素 el 移除了 enterFromClass，同时添加了 enterToClass 样式。</p>
+<p>其中，props 传入的 onEnter 函数就是我们写 Transition 组件时添加的 enter 钩子函数，enterFromClass 是我们在 beforeEnter 阶段添加的，会在当前阶段移除，新增的 enterToClass 值默认是 v-enter-to，如果给 Transition 组件传入了 name 的 prop，比如 fade，那么 enterToClass 的值就是 fade-enter-to。</p>
+<p>注意，当我们添加了 enterToClass 后，这个时候浏览器就开始根据我们编写的 CSS 进入过渡动画了，那么动画何时结束呢？</p>
+<p>Transition 组件允许我们传入 enterDuration 这个 prop，它会指定进入过渡的动画时长，当然如果你不指定，Vue.js 内部会监听动画结束事件，然后在动画结束后，执行 finishEnter 函数，来看它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">finishEnter</span> = (<span class="hljs-params">el, isAppear, done</span>) =&gt; &#123;
+  <span class="hljs-title function_">removeTransitionClass</span>(el, isAppear ? appearToClass : enterToClass);
+  <span class="hljs-title function_">removeTransitionClass</span>(el, isAppear ? appearActiveClass : enterActiveClass);
+  done &amp;&amp; <span class="hljs-title function_">done</span>();
+&#125;;</code></pre>
+<p>其实就是给 DOM 元素移除 enterToClass 以及 enterActiveClass，同时执行 done 函数，进而执行 onAfterEnter 钩子函数。</p>
+<p>至此，元素进入的过渡动画逻辑就分析完了，接下来我们来分析元素离开的过渡动画逻辑。</p>
+<p>当元素被删除的时候，会执行 remove 方法，在真正从 DOM 移除元素前且存在过渡的情况下，会执行 vnode.transition 中的 leave 钩子函数，并且把移动 DOM 的方法作为第二个参数传入，我们来看它的定义：</p>
+<pre><code class="hljs javascript"><span class="hljs-title function_">leave</span>(<span class="hljs-params">el, remove</span>) &#123;
+  <span class="hljs-keyword">const</span> key = <span class="hljs-title class_">String</span>(vnode.<span class="hljs-property">key</span>)
+  <span class="hljs-keyword">if</span> (el.<span class="hljs-property">_enterCb</span>) &#123;
+    el.<span class="hljs-title function_">_enterCb</span>(<span class="hljs-literal">true</span> <span class="hljs-comment">/* cancelled */</span>)
+  &#125;
+  <span class="hljs-keyword">if</span> (state.<span class="hljs-property">isUnmounting</span>) &#123;
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">remove</span>()
+  &#125;
+  <span class="hljs-title function_">callHook</span>(onBeforeLeave, [el])
+  <span class="hljs-keyword">let</span> called = <span class="hljs-literal">false</span>
+  <span class="hljs-keyword">const</span> done = (el.<span class="hljs-property">_leaveCb</span> = <span class="hljs-function">(<span class="hljs-params">cancelled</span>) =&gt;</span> &#123;
+    <span class="hljs-keyword">if</span> (called)
+      <span class="hljs-keyword">return</span>
+    called = <span class="hljs-literal">true</span>
+    <span class="hljs-title function_">remove</span>()
+    <span class="hljs-keyword">if</span> (cancelled) &#123;
+      <span class="hljs-title function_">callHook</span>(onLeaveCancelled, [el])
+    &#125;
+    <span class="hljs-keyword">else</span> &#123;
+      <span class="hljs-title function_">callHook</span>(onAfterLeave, [el])
+    &#125;
+    el.<span class="hljs-property">_leaveCb</span> = <span class="hljs-literal">undefined</span>
+    <span class="hljs-keyword">if</span> (leavingVNodesCache[key] === vnode) &#123;
+      <span class="hljs-keyword">delete</span> leavingVNodesCache[key]
+    &#125;
+  &#125;)
+  leavingVNodesCache[key] = vnode
+  <span class="hljs-keyword">if</span> (onLeave) &#123;
+    <span class="hljs-title function_">onLeave</span>(el, done)
+    <span class="hljs-keyword">if</span> (onLeave.<span class="hljs-property">length</span> &lt;= <span class="hljs-number">1</span>) &#123;
+      <span class="hljs-title function_">done</span>()
+    &#125;
+  &#125;
+  <span class="hljs-keyword">else</span> &#123;
+    <span class="hljs-title function_">done</span>()
+  &#125;
+&#125;</code></pre>
+<p>leave 钩子函数主要做的事情就是执行 props 传入的 onBeforeLeave 钩子函数和 onLeave 函数，onLeave 函数的第二个参数是一个 done 函数，它表示离开过渡动画结束后执行的回调函数。</p>
+<p>done 函数内部主要做的事情就是执行 remove 方法移除 DOM，然后执行 onAfterLeave 钩子函数或者是 onLeaveCancelled 函数，其它的逻辑我们也先不看。</p>
+<p>接下来，我们重点看一下 onLeave 函数的实现，看看离开过渡动画是如何执行的。</p>
+<pre><code class="hljs javascript"><span class="hljs-title function_">onLeave</span>(<span class="hljs-params">el, done</span>) &#123;
+  <span class="hljs-keyword">const</span> <span class="hljs-title function_">resolve</span> = (<span class="hljs-params"></span>) =&gt; <span class="hljs-title function_">finishLeave</span>(el, done)
+  <span class="hljs-title function_">addTransitionClass</span>(el, leaveActiveClass)
+  <span class="hljs-title function_">addTransitionClass</span>(el, leaveFromClass)
+  <span class="hljs-title function_">nextFrame</span>(<span class="hljs-function">() =&gt;</span> &#123;
+    <span class="hljs-title function_">removeTransitionClass</span>(el, leaveFromClass)
+    <span class="hljs-title function_">addTransitionClass</span>(el, leaveToClass)
+    <span class="hljs-keyword">if</span> (!(onLeave &amp;&amp; onLeave.<span class="hljs-property">length</span> &gt; <span class="hljs-number">1</span>)) &#123;
+      <span class="hljs-keyword">if</span> (leaveDuration) &#123;
+        <span class="hljs-built_in">setTimeout</span>(resolve, leaveDuration)
+      &#125;
+      <span class="hljs-keyword">else</span> &#123;
+        <span class="hljs-title function_">whenTransitionEnds</span>(el, type, resolve)
+      &#125;
+    &#125;
+  &#125;)
+  onLeave &amp;&amp; <span class="hljs-title function_">onLeave</span>(el, resolve)
+&#125;</code></pre>
+<p>onLeave 函数首先给 DOM 元素添加 leaveActiveClass 和 leaveFromClass，并执行基础 props 传入的 onLeave 钩子函数，然后在下一帧移除 leaveFromClass，并添加 leaveToClass。</p>
+<p>其中，leaveActiveClass 的默认值是 v-leave-active，leaveFromClass 的默认值是 v-leave-from，leaveToClass 的默认值是 v-leave-to。如果给 Transition 组件传入了 name 的 prop，比如 fade，那么 leaveActiveClass 的值就是 fade-leave-active，leaveFromClass 的值就是 fade-leave-from，leaveToClass 的值就是 fade-leave-to。</p>
+<p>注意，当我们添加 leaveToClass 时，浏览器就开始根据我们编写的 CSS 执行离开过渡动画了，那么动画何时结束呢？</p>
+<p>和进入动画类似，Transition 组件允许我们传入 leaveDuration 这个 prop，指定过渡的动画时长，当然如果你不指定，Vue.js 内部会监听动画结束事件，然后在动画结束后，执行 resolve 函数，它是执行 finishLeave 函数的返回值，来看它的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">finishLeave</span> = (<span class="hljs-params">el, done</span>) =&gt; &#123;
+  <span class="hljs-title function_">removeTransitionClass</span>(el, leaveToClass);
+  <span class="hljs-title function_">removeTransitionClass</span>(el, leaveActiveClass);
+  done &amp;&amp; <span class="hljs-title function_">done</span>();
+&#125;;</code></pre>
+<p>其实就是给 DOM 元素移除 leaveToClass 以及 leaveActiveClass，同时执行 done 函数，进而执行 onAfterLeave 钩子函数。</p>
+<p>至此，元素离开的过渡动画逻辑就分析完了，可以看出离开过渡动画和进入过渡动画是的思路差不多，本质上都是在添加和移除一些 CSS 去执行动画，并且在过程中执行用户传入的钩子函数。</p>
+<h2 id="2-模式的应用">2 模式的应用</h2>
+<p>前面我们在介绍 Transition 的渲染过程中提到过模式的应用，模式有什么用呢，我们还是通过示例说明，把前面的例子稍加修改：</p>
+<pre><code class="hljs javascript">&lt;template&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;app&quot;</span>&gt;</span></span>
+<span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">button</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">&quot;show = !show&quot;</span>&gt;</span></span>
+<span class="language-xml">      Toggle render</span>
+<span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span>
+<span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">transition</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;fade&quot;</span>&gt;</span></span>
+<span class="language-xml">      <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-if</span>=<span class="hljs-string">&quot;show&quot;</span>&gt;</span>hello<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+<span class="language-xml">      <span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-else</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+<span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">transition</span>&gt;</span></span>
+<span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+&lt;/template&gt;
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"></span></span>
+<span class="language-javascript"><span class="language-xml">  <span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">    <span class="hljs-title function_">data</span>(<span class="hljs-params"></span>) &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">      <span class="hljs-keyword">return</span> &#123;</span></span>
+<span class="language-javascript"><span class="language-xml">        <span class="hljs-attr">show</span>: <span class="hljs-literal">true</span></span></span>
+<span class="language-javascript"><span class="language-xml">      &#125;</span></span>
+<span class="language-javascript"><span class="language-xml">    &#125;</span></span>
+<span class="language-javascript"><span class="language-xml">  &#125;</span></span>
+<span class="language-javascript"><span class="language-xml"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="language-css"></span></span>
+<span class="language-css"><span class="language-xml">  <span class="hljs-selector-class">.fade-enter-active</span>,</span></span>
+<span class="language-css"><span class="language-xml">  <span class="hljs-selector-class">.fade-leave-active</span> &#123;</span></span>
+<span class="language-css"><span class="language-xml">    <span class="hljs-attribute">transition</span>: opacity <span class="hljs-number">0.5s</span> ease;</span></span>
+<span class="language-css"><span class="language-xml">  &#125;</span></span>
+<span class="language-css"><span class="language-xml">  <span class="hljs-selector-class">.fade-enter-from</span>,</span></span>
+<span class="language-css"><span class="language-xml">  <span class="hljs-selector-class">.fade-leave-to</span> &#123;</span></span>
+<span class="language-css"><span class="language-xml">    <span class="hljs-attribute">opacity</span>: <span class="hljs-number">0</span>;</span></span>
+<span class="language-css"><span class="language-xml">  &#125;</span></span>
+<span class="language-css"><span class="language-xml"></span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span></span></code></pre>
+<p>我们在 show 条件为 false 的情况下，显示字符串 hi，你可以运行这个示例，然后会发现这个过渡效果有点生硬，并不理想。</p>
+<p>然后，我们给这个 Transition 组件加一个 out-in 的 mode：</p>
+<pre><code class="hljs javascript">&lt;transition mode=<span class="hljs-string">&quot;out-in&quot;</span> name=<span class="hljs-string">&quot;fade&quot;</span>&gt;
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-if</span>=<span class="hljs-string">&quot;show&quot;</span>&gt;</span>hello<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+  <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span> <span class="hljs-attr">v-else</span>&gt;</span>hi<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span></span>
+&lt;/transition&gt;</code></pre>
+<p>我们会发现这个过渡效果好多了，hello 文本先完成离开的过渡后，hi 文本开始进入过渡动画。</p>
+<p>模式非常适合这种两个元素切换的场景，Vue.js 给 Transition 组件提供了两种模式， in-out 和 out-in ，它们有什么区别呢？</p>
+<ul>
+<li>在 in-out 模式下，新元素先进行过渡，完成之后当前元素过渡离开。</li>
+<li>在 out-in 模式下，当前元素先进行过渡，完成之后新元素过渡进入。</li>
+</ul>
+<p>在实际工作中，你大部分情况都是在使用 out-in 模式，而 in-out 模式很少用到，所以接下来我们就来分析 out-in 模式的实现原理。</p>
+<p>我们先不妨思考一下，为什么在不加模式的情况下，会出现示例那样的过渡效果。</p>
+<p>当我们点击按钮，show 变量由 true 变成 false，会触发当前元素 hello 文本的离开动画，也会同时触发新元素 hi 文本的进入动画。由于动画是同时进行的，而且在离开动画结束之前，当前元素 hello 是没有被移除 DOM 的，所以它还会占位，就把新元素 hi 文本挤到下面去了。当 hello 文本的离开动画执行完毕从 DOM 中删除后，hi 文本才能回到之前的位置。</p>
+<p>那么，我们怎么做才能做到当前元素过渡动画执行完毕后，再执行新元素的过渡呢？</p>
+<p>我们来看一下 out-in 模式的实现：</p>
+<pre><code class="hljs javascript"><span class="hljs-keyword">const</span> leavingHooks = <span class="hljs-title function_">resolveTransitionHooks</span>(
+  oldInnerChild,
+  rawProps,
+  state,
+  instance
+);
+<span class="hljs-title function_">setTransitionHooks</span>(oldInnerChild, leavingHooks);
+<span class="hljs-keyword">if</span> (mode === <span class="hljs-string">&quot;out-in&quot;</span>) &#123;
+  state.<span class="hljs-property">isLeaving</span> = <span class="hljs-literal">true</span>;
+  leavingHooks.<span class="hljs-property">afterLeave</span> = <span class="hljs-function">() =&gt;</span> &#123;
+    state.<span class="hljs-property">isLeaving</span> = <span class="hljs-literal">false</span>;
+    instance.<span class="hljs-title function_">update</span>();
+  &#125;;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">emptyPlaceholder</span>(child);
+&#125;</code></pre>
+<p>当模式为 out-in 的时候，会标记 state.isLeaving 为 true，然后返回一个空的注释节点，同时更新当前元素的钩子函数中的 afterLeave 函数，内部执行 instance.update 重新渲染组件。</p>
+<p>这样做就保证了在当前元素执行离开过渡的时候，新元素只渲染成一个注释节点，这样页面上看上去还是只执行当前元素的离开过渡动画。</p>
+<p>然后当离开动画执行完毕后，触发了 Transition 组件的重新渲染，这个时候就可以如期渲染新元素并执行进入过渡动画了，是不是很巧妙呢？</p>
+<h2 id="3-总结">3 总结</h2>
+<p>好的，到这里这一篇的内容就结束了，通过本篇，我们应该了解了 Transition 组件是如何渲染的，如何执行过渡动画和相应的钩子函数的，以及当两个视图切换时，模式的工作原理是怎样的。</p>
+<p>最后，思考一个问题，Transition 组件在 beforeEnter 钩子函数里会判断 el._leaveCb 是否存在，存在则执行，在 leave 钩子函数里会判断 el._enterCb 是否存在，存在则执行，这么做的原因是什么？</p>
+<blockquote>
+<p><strong>本篇的相关代码在源代码中的位置如下</strong>：<br>
+packages/runtime-core/src/components/BasetTransition.ts<br>
+packages/runtime-core/src/renderer.ts<br>
+packages/runtime-dom/src/components/Transition.ts</p>
+</blockquote>
+ 
+      <div id="toc-article">
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E9%92%A9%E5%AD%90%E5%87%BD%E6%95%B0%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="toc-text">1 钩子函数的执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-text">2 模式的应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E6%80%BB%E7%BB%93"><span class="toc-text">3 总结</span></a></li></ol>
+    </div>
+  </div>
+
+</div>
+       
+      <blockquote id="copyright">
+        <p>
+           原文链接:
+          <a href="https://jesse121.github.io/blog/articles/2021/01/25.html"
+            >https://jesse121.github.io/blog/articles/2021/01/25.html</a
+          >
+        </p>
+        <p>版权声明: 转载请注明出处.</p>
+      </blockquote>
+       
+    </div>
+    <footer class="article-footer">
+      
+      <div class="article-tag-wrap">
+        
+ 
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/vue/" rel="tag">vue</a></li></ul>
+ 
+
+
+      </div>
+        
+<nav id="article-nav">
+  
+    <a href="/blog/articles/2021/01/24.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          Vue3.0 核心源码解读 | Transition 组件：过渡动画的实现原理是怎样的？（上）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/articles/2021/01/26.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          Vue3.0 核心源码解读 | Vue Router：如何实现一个前端路由？（上）
+        
+      </div>
+    </a>
+  
+</nav>
+   
+  <div id="comments"></div>
+
+
+
+
+
+
+
+
+ 
+    </footer>
+  </div>
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
+  <div class="widget">
+    <ul>
+       
+      <li>
+        <a href="/blog/articles/2023/06/18.html"
+          >页面添加动态水印的处理方法</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/27.html"
+          >前端项目如何自定义页面Import排序？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/20.html"
+          >图片二进制流如何在页面显示？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/15.html"
+          >如何编写Vue3组件测试用例？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/14.html"
+          >Vue3项目如何利用vitest做单元测试</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/12/18.html"
+          >《第一本Docker书》--读书笔记</a
+        >
+      </li>
+          
+      <li>
+        <a href="/blog/articles/2022/11/22.html"
+          >基于ElementPlus封装的季度选择器组件</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/11/16.html"
+          >掘金小册-Electron+Vue3桌面应用开发学习记录</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/10/29.html"
+          >如何使用Monorepo实现跨项目共享组件和模块</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/09/10.html"
+          >手写Promise思考过程</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/08.html"
+          >如何解决Electron应用安装在C盘没有权限更新的问题</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/05.html"
+          >如何用Electron+vue+vite构建桌面端应用(三)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/04.html"
+          >如何用Electron+vue+vite构建桌面端应用(二)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/22.html"
+          >从源码分析为什么Electron+vue项目中router不能用history模式</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/20.html"
+          >如何用Electron+vue+vite构建桌面端应用(一)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/06/15.html"
+          >如何在国产银河麒麟系统Mips架构上离线安装electron</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/11/28.html"
+          >《学习Javascript数据结构和算法》--读书笔记</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/10/27.html"
+          >极客时间-正则表达式</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/09/04.html"
+          >Typescript内置工具类型和操作符介绍</a
+        >
+      </li>
+       
+    </ul>
+  </div>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/angularjs/" style="font-size: 10px;">AngularJs</a> <a href="/blog/tags/apache/" style="font-size: 12.22px;">Apache</a> <a href="/blog/tags/arraybuffer/" style="font-size: 10px;">ArrayBuffer</a> <a href="/blog/tags/axios/" style="font-size: 10px;">Axios</a> <a href="/blog/tags/blob/" style="font-size: 10px;">Blob</a> <a href="/blog/tags/bootstrap/" style="font-size: 12.22px;">Bootstrap</a> <a href="/blog/tags/css/" style="font-size: 16.67px;">CSS</a> <a href="/blog/tags/canvas/" style="font-size: 10px;">Canvas</a> <a href="/blog/tags/centos/" style="font-size: 10px;">CentOS</a> <a href="/blog/tags/charles/" style="font-size: 10px;">Charles</a> <a href="/blog/tags/docker/" style="font-size: 13.33px;">Docker</a> <a href="/blog/tags/elementplus/" style="font-size: 10px;">ElementPlus</a> <a href="/blog/tags/eslint/" style="font-size: 10px;">Eslint</a> <a href="/blog/tags/git/" style="font-size: 11.11px;">Git</a> <a href="/blog/tags/gitlab/" style="font-size: 10px;">Gitlab</a> <a href="/blog/tags/gulp/" style="font-size: 10px;">Gulp</a> <a href="/blog/tags/html/" style="font-size: 12.22px;">HTML</a> <a href="/blog/tags/html5/" style="font-size: 10px;">HTML5</a> <a href="/blog/tags/http/" style="font-size: 12.22px;">HTTP</a> <a href="/blog/tags/https/" style="font-size: 10px;">HTTPS</a> <a href="/blog/tags/husky/" style="font-size: 10px;">Husky</a> <a href="/blog/tags/javascript/" style="font-size: 18.89px;">JavaScript</a> <a href="/blog/tags/jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/blog/tags/linux/" style="font-size: 11.11px;">Linux</a> <a href="/blog/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/blog/tags/mutationobserver/" style="font-size: 10px;">MutationObserver</a> <a href="/blog/tags/mysql/" style="font-size: 12.22px;">MySQL</a> <a href="/blog/tags/nginx/" style="font-size: 11.11px;">Nginx</a> <a href="/blog/tags/node-js/" style="font-size: 11.11px;">Node.js</a> <a href="/blog/tags/php/" style="font-size: 14.44px;">PHP</a> <a href="/blog/tags/photoshop/" style="font-size: 10px;">Photoshop</a> <a href="/blog/tags/react/" style="font-size: 10px;">React</a> <a href="/blog/tags/redux/" style="font-size: 10px;">Redux</a> <a href="/blog/tags/regexp/" style="font-size: 10px;">Regexp</a> <a href="/blog/tags/sse/" style="font-size: 10px;">SSE</a> <a href="/blog/tags/sublimetext3/" style="font-size: 10px;">SublimeText3</a> <a href="/blog/tags/svg/" style="font-size: 10px;">Svg</a> <a href="/blog/tags/typescript/" style="font-size: 13.33px;">Typescript</a> <a href="/blog/tags/vagrant/" style="font-size: 10px;">Vagrant</a> <a href="/blog/tags/vim/" style="font-size: 10px;">Vim</a> <a href="/blog/tags/vitest/" style="font-size: 11.11px;">Vitest</a> <a href="/blog/tags/vue/" style="font-size: 10px;">Vue</a> <a href="/blog/tags/vue3/" style="font-size: 14.44px;">Vue3</a> <a href="/blog/tags/web/" style="font-size: 14.44px;">WEB</a> <a href="/blog/tags/webpack/" style="font-size: 12.22px;">Webpack</a> <a href="/blog/tags/wireshark/" style="font-size: 11.11px;">Wireshark</a> <a href="/blog/tags/yii/" style="font-size: 10px;">Yii</a> <a href="/blog/tags/electron/" style="font-size: 15.56px;">electron</a> <a href="/blog/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/blog/tags/jquery/" style="font-size: 12.22px;">jQuery</a> <a href="/blog/tags/kylin/" style="font-size: 10px;">kylin</a> <a href="/blog/tags/monorepo/" style="font-size: 10px;">monorepo</a> <a href="/blog/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/blog/tags/vite/" style="font-size: 13.33px;">vite</a> <a href="/blog/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/blog/tags/vue/" style="font-size: 20px;">vue</a> <a href="/blog/tags/vue3/" style="font-size: 13.33px;">vue3</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">前端监控</a> <a href="/blog/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/" style="font-size: 10px;">微信小程序</a> <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 17.78px;">数据结构</a> <a href="/blog/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.78px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/bootstrap/">Bootstrap</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/electron/">Electron</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html-css/">HTML-CSS</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html5/">HTML5</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/javascript/">JavaScript</a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/mysql/">MySQL</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/node-js/">Node.js</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/php/">PHP</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/photoshop/">Photoshop</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/regexp/">Regexp</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/typescript/">Typescript</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/vue3/">Vue3</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/web/">WEB</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/jquery/">jQuery</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%85%B6%E4%BB%96/">其他</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/translation/">前端翻译</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">开发问题记录</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E7%AE%97%E6%B3%95/">算法</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/notes/">读书笔记</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2023/">2023年</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2022/">2022年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2021/">2021年</a><span class="archive-list-count">40</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/">2020年</a><span class="archive-list-count">20</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/">2019年</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/">2018年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/">2017年</a><span class="archive-list-count">26</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/">2016年</a><span class="archive-list-count">27</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-link"></i> 收藏</h3>
+    <div class="widget">
+      <ul>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.mahaixiang.cn/internet/300.html">深入理解互联网协议的原理</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://javascript.ruanyifeng.com/">JavaScript 标准参考教程</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7131211363493347335">JavaScript代码优化之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7224382896626778172">简述 js 的代码整洁之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.eggcake.cn/posts/2020-12-19-vue3-core-source-code-0">Vue3.0核心源码解读</a>
+        </li>
+      
+      </ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <a id="totop" href="#top"></a>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <p>
+        <a href="/blog/sitemap.xml">网站地图</a>
+        <span> | </span
+        ><a href="/blog/atom.xml">订阅本站</a>
+        <span> | </span
+        ><a href="/blog/about/">联系博主</a>
+      </p>
+      
+      <p>
+        <i class="fa fa-visitors"></i>
+        <i id="busuanzi_container_site_uv"
+          ><i id="busuanzi_value_site_uv"></i
+        ></i>
+        ，
+        <i class="fa fa-views"></i>
+        <i id="busuanzi_container_site_pv"
+          ><i id="busuanzi_value_site_pv"></i
+        ></i>
+      </p>
+      
+      <p>
+        <span
+          >Copyright &copy; 2026 Jesse.</span
+        >
+        <span
+          >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span
+        >
+      </p>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+  
+<script src="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+
+<script>
+  hljs.highlightAll();
+</script>
+
+<script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+<script src="/blog/js/search.json.js"></script>
+  
+<script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+ 
+<script src="/blog/js/script.js"></script>
+ 
+ 
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?8e59984317ab1777a88e5b3e62c7c767";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+  
+<script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+      
+<script src="https://unpkg.com/gitalk@1.7.2/dist/gitalk.min.js"></script>
+ 
+<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: "3c3e422527fd3f9fa17a",
+    clientSecret: "f28d1808ec9ab69fb24dc3e9fad81e1c3ab8dd83",
+    repo: "blog",
+    owner: "jesse121",
+    admin: ["jesse121"],
+    id: md5(window.location.pathname),
+    proxy: "https://stormy-gorge-51623.herokuapp.com/https://github.com/login/oauth/access_token",
+    distractionFreeMode: false,
+    language: "zh-CN",
+    body: "欢迎在下方提出问题，您的疑问促进我们共同进步！",
+    pagerDirection: "last",
+  });
+  gitalk.render("comments");
+</script>
+         
+ 
+<script
+  type="text/javascript"
+  src="https://unpkg.com/clipboard@2.0.4/dist/clipboard.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="/blog/js/codeBlock/codeBlockFunction.js"
+></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeLang.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeCopy.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeShrink.js"></script>
+
+</body>
+</html>
