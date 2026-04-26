@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+   
+  <title>Lint-Staged 与 Ls-Lint 配合使用时的陷阱 | 前端之路</title>
+  <meta name="theme-color" content="#bccddd" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <meta name="description" content="专注前端开发，前端开发技术博客" />
+   
+  <meta name="keywords" content="Web前端开发，Javascript，前端开发博客" />
+  
+  <link rel="dns-prefetch" href="https://unpkg.com" />
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info" />
+   <link rel="alternate" href="/blog/atom.xml" title="前端之路" type="application/atom+xml">   <link rel="shortcut icon" href="/blog/favicon.ico"> 
+  <link rel="bookmark" href="/blog/favicon.ico" />
+  <link rel="apple-touch-icon" href="/blog/apple-touch-icon.png" />
+  <link rel="apple-touch-icon-precomposed" href="/blog/apple-touch-icon.png" />
+   
+<link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/xt256.min.css">
+  
+<link rel="stylesheet" href="/blog/css/style.css">
+  
+<link rel="stylesheet" href="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+    
+<link rel="stylesheet" href="https://unpkg.com/gitalk@1.7.2/dist/gitalk.css">
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/blog/" id="logo">前端之路</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/blog/" id="subtitle">路漫漫其修远兮，吾将上下而求索</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/blog/."><i class="fa fa-home"></i> 首页</a>
+        
+          <a class="main-nav-link" href="/blog/archives/"><i class="fa fa-archive"></i> 归档</a>
+        
+          <a class="main-nav-link" href="/blog/about/"><i class="fa fa-user"></i> 关于</a>
+        
+      </nav>
+    </div>
+    <div id="search-form">
+      <div id="result-mask" class="hide"></div>
+      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
+      <div id="result-wrap" class="hide">
+        <div id="search-result"></div>
+      </div>
+      <div class="hide">
+        <template id="search-tpl">
+          <div class="item">
+            <a href="/{path}" title="{title}">
+              <div class="title">{title}</div>
+              <div class="time">{date}</div>
+              <div class="tags">{tags}</div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><style>
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    /* font-size: 0.91rem; */
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  pre code {
+    padding: 0 !important;
+    color: #e8eaf6;
+    background-color: #272822;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+  .line-numbers-rows {
+    border-right-width: 0px !important;
+  }
+
+  .line-numbers {
+    padding: 1.5rem 1.5rem 1.5rem 3.2rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre {
+    padding: 1.5rem !important;
+    margin: 1rem 0 !important;
+    background: #272822;
+    overflow: auto;
+    border-radius: 0.35rem;
+    tab-size: 4;
+  }
+
+  pre::before {
+    content: "";
+    height: 16px;
+    margin-bottom: 0;
+    display: block;
+  }
+
+  pre::after {
+    content: " ";
+    position: absolute;
+    border-radius: 50%;
+    background: #ff5f56;
+    width: 12px;
+    height: 12px;
+    top: 0;
+    left: 12px;
+    margin-top: 12px;
+    -webkit-box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+    box-shadow: 20px 0 #ffbd2e, 40px 0 #27c93f;
+  }
+
+  code {
+    padding: 1px 5px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier,
+      monospace;
+    font-size: 0.91rem;
+    color: #e96900;
+    background-color: #f8f8f8;
+    border-radius: 2px;
+  }
+
+  .code_copy {
+    position: absolute;
+    top: 0.7rem;
+    right: 35px;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code_lang {
+    position: absolute;
+    top: 1.2rem;
+    right: 60px;
+    line-height: 0;
+    font-weight: bold;
+    font-family: normal;
+    z-index: 1;
+    filter: invert(50%);
+    cursor: pointer;
+  }
+
+  .code-expand {
+    position: absolute;
+    top: 4px;
+    right: 0px;
+    filter: invert(50%);
+    padding: 7px 10px;
+    z-index: 1;
+    cursor: pointer;
+    transition: all 0.3s;
+    transform: rotate(0deg);
+  }
+
+  .code-closed .code-expand {
+    transform: rotate(-180deg) !important;
+    transition: all 0.3s;
+  }
+
+  .code-closed pre::before {
+    height: 0px;
+  }
+
+  pre code {
+    padding: 0;
+    color: #e8eaf6;
+    background-color: #272822 !important;
+  }
+
+  pre[class*="language-"] {
+    padding: 1.2em;
+    margin: 0.5em 0;
+  }
+
+  code[class*="language-"],
+  pre[class*="language-"] {
+    color: #e8eaf6;
+    white-space: pre-wrap !important;
+  }
+</style>
+<article
+  id="post-tool/lint-staged 与 ls-lint 配合使用时的陷阱"
+  class="h-entry article article-type-post"
+  itemprop="blogPost"
+  itemscope
+  itemtype="https://schema.org/BlogPosting"
+>
+  <div class="article-inner">
+     
+    <header class="article-header">
+      
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Lint-Staged 与 Ls-Lint 配合使用时的陷阱
+    </h1>
+  
+
+
+    </header>
+    
+    <div class="article-meta">
+       <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2026-04-24T16:00:00.000Z" itemprop="datePublished">2026年04月25日</time>
+</span> 
+  <div class="article-category">
+    <i class="fa fa-classify"></i>
+    <a class="article-category-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具</a>
+  </div>
+  <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+  
+<a href="/blog/articles/2026/04/25.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+       <h3 id="问题背景">问题背景</h3>
+<p>在最近的一个 React + TypeScript 项目中，我使用了 <code>lint-staged</code> 配合 <code>ls-lint</code> 来实现 Git 提交时的文件名规范自动检查。配置看起来很简单：</p>
+<span id="more"></span>
+<pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-attr">&quot;lint-staged&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span>
+    <span class="hljs-attr">&quot;*.&#123;ts,tsx,js,jsx&#125;&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;eslint --fix&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;ls-lint&quot;</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">&#125;</span>
+<span class="hljs-punctuation">&#125;</span></code></pre>
+<p><code>.ls-lint.yml</code> 配置文件规定了命名规则：</p>
+<pre><code class="hljs yaml"><span class="hljs-attr">ignore:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">node_modules</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">.git</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-string">dist</span>
+
+<span class="hljs-attr">ls:</span>
+  <span class="hljs-string">.tsx:</span> <span class="hljs-string">PascalCase</span> <span class="hljs-comment"># .tsx 文件应该使用帕斯卡命名（首字母大写）</span>
+  <span class="hljs-string">.ts:</span> <span class="hljs-string">kebab-case</span> <span class="hljs-comment"># .ts 文件使用短横线命名</span>
+  <span class="hljs-string">.js:</span> <span class="hljs-string">kebab-case</span>
+  <span class="hljs-string">.css:</span> <span class="hljs-string">kebab-case</span></code></pre>
+<p>按照这个规则，<code>src/main.tsx</code> 这样的文件名（小写开头）应该在提交时被拦截并报错。但奇怪的是，git commit 时检测通过了，而手动执行却报错了。</p>
+<h3 id="问题复现">问题复现</h3>
+<h4 id="场景一：手动执行-ls-lint（相对路径）">场景一：手动执行 ls-lint（相对路径）</h4>
+<pre><code class="hljs bash">$ npx ls-lint src/main.tsx
+src/main.tsx failed <span class="hljs-keyword">for</span> `.tsx` rules: pascalcase</code></pre>
+<p>✅ 符合预期：检测到命名不规范，退出码为 1。</p>
+<h4 id="场景二：Git-提交时通过-lint-staged-执行">场景二：Git 提交时通过 lint-staged 执行</h4>
+<pre><code class="hljs bash">$ git add src/main.tsx
+$ git commit -m <span class="hljs-string">&quot;test&quot;</span>
+✔ Preparing...
+✔ Running tasks...
+  ✔ eslint --fix
+  ✔ ls-lint
+✔ Applying modifications...</code></pre>
+<p>❌ 不符合预期：<code>ls-lint</code> git提交成功，没有检测到命名问题！</p>
+<h3 id="深入调试">深入调试</h3>
+<p>为了找出原因，我创建了一个调试脚本来查看 <code>lint-staged</code> 实际传递给 <code>ls-lint</code> 的参数：</p>
+<pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
+<span class="hljs-comment"># test-ls-lint.sh</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Arguments received: <span class="hljs-variable">$@</span>&quot;</span> &gt;&gt; /tmp/lint-staged-debug.log
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Number of arguments: <span class="hljs-variable">$#</span>&quot;</span> &gt;&gt; /tmp/lint-staged-debug.log
+npx ls-lint <span class="hljs-string">&quot;<span class="hljs-variable">$@</span>&quot;</span> 2&gt;&amp;1
+<span class="hljs-built_in">exit</span> $?</code></pre>
+<p>修改 <code>package.json</code> 临时使用这个脚本：</p>
+<pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-attr">&quot;lint-staged&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span>
+    <span class="hljs-attr">&quot;*.&#123;ts,tsx,js,jsx&#125;&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;eslint --fix&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;./test-ls-lint.sh&quot;</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">&#125;</span>
+<span class="hljs-punctuation">&#125;</span></code></pre>
+<p>再次提交后查看日志：</p>
+<pre><code class="hljs bash">$ <span class="hljs-built_in">cat</span> /tmp/lint-staged-debug.log
+Arguments received: /Users/jesse/Web/study/React/my-app/src/main.tsx
+Number of arguments: 1</code></pre>
+<p><strong>关键发现</strong>：<code>lint-staged</code> 传递的是绝对路径，而不是相对路径！</p>
+<h3 id="验证假设">验证假设</h3>
+<p>我分别测试了相对路径和绝对路径的情况：</p>
+<pre><code class="hljs bash"><span class="hljs-comment"># 测试 1：相对路径</span>
+$ npx ls-lint src/main.tsx
+src/main.tsx failed <span class="hljs-keyword">for</span> `.tsx` rules: pascalcase
+$ <span class="hljs-built_in">echo</span> $?
+1  <span class="hljs-comment"># 报错，符合预期</span>
+
+<span class="hljs-comment"># 测试 2：绝对路径</span>
+$ npx ls-lint /Users/jesse/Web/study/React/my-app/src/main.tsx
+$ <span class="hljs-built_in">echo</span> $?
+0  <span class="hljs-comment"># 通过，不符合预期！</span></code></pre>
+<p><strong>真相大白</strong>：<code>ls-lint</code> 在处理绝对路径时，无法正确应用 <code>.ls-lint.yml</code> 中定义的命名规则，导致检测被静默绕过。</p>
+<h3 id="根本原因分析">根本原因分析</h3>
+<p>经过分析和查阅 <code>ls-lint</code> 的文档，我发现：</p>
+<ol>
+<li>
+<p><code>ls-lint</code> 的设计初衷：它是一个基于项目结构的文件命名 lint 工具，需要根据文件相对于项目根目录的路径来应用规则。</p>
+</li>
+<li>
+<p>绝对路径的问题：当传入绝对路径时，<code>ls-lint</code> 无法正确解析文件在项目中的相对位置，导致规则匹配失败或被忽略。</p>
+</li>
+<li>
+<p><code>lint-staged</code> 的行为：默认情况下，<code>lint-staged</code> 会将暂存文件的绝对路径作为参数传递给命令，这是为了保证命令在任何工作目录下都能正确找到文件。</p>
+</li>
+</ol>
+<p>这就造成了一个矛盾：</p>
+<ul>
+<li><code>lint-staged</code> 传递绝对路径（为了保证可靠性）</li>
+<li><code>ls-lint</code> 需要相对路径（为了正确应用规则）</li>
+</ul>
+<h3 id="官方回应">官方回应</h3>
+<p>这个问题已经被社区发现并报告给 <code>ls-lint</code> 开发团队。在 GitHub Issue <a target="_blank" rel="noopener" href="https://github.com/loeffel-io/ls-lint/issues/321#event-23632539750">#321</a> 中，有开发者提出了相同的疑问。</p>
+<p>好消息：<code>ls-lint</code> 开发团队已经确认了这个问题，并计划在 v2.4.0 版本中添加对绝对路径的支持。<br>
+但在 v2.4.0 发布之前，我们仍然需要使用本文提到的解决方案来确保文件名校验正常工作。</p>
+<h3 id="最终解决方案">最终解决方案</h3>
+<p>经过多次尝试，我找到了最优雅的解决方案：<br>
+在 Husky 的 <code>pre-commit</code> 钩子中直接调用 <code>ls-lint</code>，并使用 <code>git diff --staged --name-only</code> 获取暂存文件的相对路径列表。</p>
+<h3 id="实现步骤">实现步骤</h3>
+<h4 id="1-从-lint-staged-配置中移除-ls-lint">1. 从 lint-staged 配置中移除 ls-lint</h4>
+<p>修改 <code>package.json</code>，将 <code>ls-lint</code> 从 <code>lint-staged</code> 配置中移除：</p>
+<pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-attr">&quot;lint-staged&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span>
+    <span class="hljs-attr">&quot;*.&#123;ts,tsx,js,jsx&#125;&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;eslint --fix&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;*.&#123;css,scss&#125;&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;stylelint --fix&quot;</span>
+  <span class="hljs-punctuation">&#125;</span>
+<span class="hljs-punctuation">&#125;</span></code></pre>
+<h4 id="2-在-pre-commit-钩子中添加-ls-lint-检查">2. 在 pre-commit 钩子中添加 ls-lint 检查</h4>
+<p>编辑 <code>.husky/pre-commit</code> 文件，在执行 <code>lint-staged</code> 之前添加 <code>ls-lint</code> 检查：</p>
+<pre><code class="hljs bash"><span class="hljs-meta">#!/usr/bin/env sh</span>
+. <span class="hljs-string">&quot;<span class="hljs-subst">$(dirname -- <span class="hljs-string">&quot;<span class="hljs-variable">$0</span>&quot;</span>)</span>/_/husky.sh&quot;</span>
+
+<span class="hljs-comment"># 检查暂存文件的命名规范（使用相对路径）</span>
+pnpm <span class="hljs-built_in">exec</span> ls-lint $(git diff --staged --name-only)
+
+<span class="hljs-comment"># 执行其他 lint-staged 检查</span>
+pnpm <span class="hljs-built_in">exec</span> lint-staged</code></pre>
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><code>git diff --staged --name-only</code> 返回的是<strong>相对路径</strong>（如 <code>src/main.tsx</code>），这正是 <code>ls-lint</code> 所需要的</li>
+<li>在 <code>lint-staged</code> 之前执行，可以尽早发现命名问题</li>
+<li>使用 <code>pnpm exec</code> 确保使用项目本地安装的 <code>ls-lint</code> 版本</li>
+</ul>
+<h3 id="验证效果">验证效果</h3>
+<p>现在再次提交不符合命名规范的文件：</p>
+<pre><code class="hljs bash">$ git add src/main.tsx
+$ git commit -m <span class="hljs-string">&quot;test&quot;</span>
+
+src/main.tsx failed <span class="hljs-keyword">for</span> `.tsx` rules: pascalcase
+husky - pre-commit hook exited with code 1 (error)</code></pre>
+<p>✅ 成功拦截：现在可以正确检测到命名问题了！</p>
+<p>提交符合规范的文件：</p>
+<pre><code class="hljs bash">$ git add src/MainComponent.tsx
+$ git commit -m <span class="hljs-string">&quot;feat: add main component&quot;</span>
+
+✔ Preparing...
+✔ Running tasks...
+✔ Applying modifications...</code></pre>
+<p>✅ 正常通过：符合规范的文件可以正常提交。</p>
+<h2 id="注意事项">注意事项</h2>
+<h3 id="1-首次提交时的边界情况">1. 首次提交时的边界情况</h3>
+<p>如果是第一次提交（没有任何历史提交），<code>git diff --staged --name-only</code> 仍然可以正常工作，它会列出所有暂存的文件。</p>
+<h3 id="2-空暂存区的处理">2. 空暂存区的处理</h3>
+<p>如果暂存区为空，<code>git diff --staged --name-only</code> 会返回空字符串，<code>ls-lint</code> 会自动跳过检查，不会报错。</p>
+<h3 id="3-删除文件的处理">3. 删除文件的处理</h3>
+<p><code>git diff --staged --name-only</code> 也会包含被删除的文件。如果这些文件已经不存在，<code>ls-lint</code> 会忽略它们，不会影响检查结果。</p>
+<h3 id="4-团队协作建议">4. 团队协作建议</h3>
+<ul>
+<li>确保所有团队成员都安装了 Husky：<code>pnpm exec husky install</code></li>
+<li>在项目的 <code>README.md</code> 中说明命名规范和检查机制</li>
+<li>考虑在 CI/CD 流程中也加入 <code>ls-lint</code> 检查，作为双重保障</li>
+</ul>
+<h3 id="总结">总结</h3>
+<p>这次问题的根本原因是：<code>lint-staged</code> 传递绝对路径，而 <code>ls-lint</code> 需要相对路径才能正确应用规则。</p>
+<p>最终的解决方案是：<strong>在 Husky 的 <code>pre-commit</code> 钩子中使用 <code>git diff --staged --name-only</code> 获取相对路径列表，然后直接传递给 <code>ls-lint</code></strong>，同时从 <code>lint-staged</code> 配置中移除 <code>ls-lint</code>。</p>
+<p>这个方案简洁、高效、可靠，完美解决了绝对路径导致的检测失效问题。希望这篇文章能帮助你避免类似的坑！</p>
+<h3 id="参考资料">参考资料</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://ls-lint.org/">ls-lint 官方文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/loeffel-io/ls-lint/issues/321#event-23632539750">ls-lint GitHub Issue #321 - 绝对路径支持</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/okonet/lint-staged">lint-staged 官方文档</a></li>
+</ul>
+ 
+      <div id="toc-article">
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E5%A4%8D%E7%8E%B0"><span class="toc-text">问题复现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%80%EF%BC%9A%E6%89%8B%E5%8A%A8%E6%89%A7%E8%A1%8C-ls-lint%EF%BC%88%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84%EF%BC%89"><span class="toc-text">场景一：手动执行 ls-lint（相对路径）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%8C%EF%BC%9AGit-%E6%8F%90%E4%BA%A4%E6%97%B6%E9%80%9A%E8%BF%87-lint-staged-%E6%89%A7%E8%A1%8C"><span class="toc-text">场景二：Git 提交时通过 lint-staged 执行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%B1%E5%85%A5%E8%B0%83%E8%AF%95"><span class="toc-text">深入调试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E5%81%87%E8%AE%BE"><span class="toc-text">验证假设</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="toc-text">根本原因分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%98%E6%96%B9%E5%9B%9E%E5%BA%94"><span class="toc-text">官方回应</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E7%BB%88%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-text">最终解决方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%AD%A5%E9%AA%A4"><span class="toc-text">实现步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%BB%8E-lint-staged-%E9%85%8D%E7%BD%AE%E4%B8%AD%E7%A7%BB%E9%99%A4-ls-lint"><span class="toc-text">1. 从 lint-staged 配置中移除 ls-lint</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%9C%A8-pre-commit-%E9%92%A9%E5%AD%90%E4%B8%AD%E6%B7%BB%E5%8A%A0-ls-lint-%E6%A3%80%E6%9F%A5"><span class="toc-text">2. 在 pre-commit 钩子中添加 ls-lint 检查</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E6%95%88%E6%9E%9C"><span class="toc-text">验证效果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">注意事项</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%A6%96%E6%AC%A1%E6%8F%90%E4%BA%A4%E6%97%B6%E7%9A%84%E8%BE%B9%E7%95%8C%E6%83%85%E5%86%B5"><span class="toc-text">1. 首次提交时的边界情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%A9%BA%E6%9A%82%E5%AD%98%E5%8C%BA%E7%9A%84%E5%A4%84%E7%90%86"><span class="toc-text">2. 空暂存区的处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%88%A0%E9%99%A4%E6%96%87%E4%BB%B6%E7%9A%84%E5%A4%84%E7%90%86"><span class="toc-text">3. 删除文件的处理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C%E5%BB%BA%E8%AE%AE"><span class="toc-text">4. 团队协作建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-text">参考资料</span></a></li></ol>
+    </div>
+  </div>
+
+</div>
+       
+      <blockquote id="copyright">
+        <p>
+           原文链接:
+          <a href="https://jesse121.github.io/blog/articles/2026/04/25.html"
+            >https://jesse121.github.io/blog/articles/2026/04/25.html</a
+          >
+        </p>
+        <p>版权声明: 转载请注明出处.</p>
+      </blockquote>
+       
+    </div>
+    <footer class="article-footer">
+      
+      <div class="article-tag-wrap">
+        
+ 
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/lint-staged/" rel="tag">lint-staged</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/ls-lint/" rel="tag">ls-lint</a></li></ul>
+ 
+
+
+      </div>
+        
+<nav id="article-nav">
+  
+    <a href="/blog/articles/2023/06/18.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          页面添加动态水印的处理方法
+        
+      </div>
+    </a>
+  
+  
+</nav>
+   
+  <div id="comments"></div>
+
+
+
+
+
+
+
+
+ 
+    </footer>
+  </div>
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
+  <div class="widget">
+    <ul>
+       
+      <li>
+        <a href="/blog/articles/2026/04/25.html"
+          >Lint-Staged 与 Ls-Lint 配合使用时的陷阱</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/06/18.html"
+          >页面添加动态水印的处理方法</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/27.html"
+          >前端项目如何自定义页面Import排序？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/05/20.html"
+          >图片二进制流如何在页面显示？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/15.html"
+          >如何编写Vue3组件测试用例？</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2023/02/14.html"
+          >Vue3项目如何利用vitest做单元测试</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/12/18.html"
+          >《第一本Docker书》--读书笔记</a
+        >
+      </li>
+          
+      <li>
+        <a href="/blog/articles/2022/11/22.html"
+          >基于ElementPlus封装的季度选择器组件</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/11/16.html"
+          >掘金小册-Electron+Vue3桌面应用开发学习记录</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/10/29.html"
+          >如何使用Monorepo实现跨项目共享组件和模块</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/09/10.html"
+          >手写Promise思考过程</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/08.html"
+          >如何解决Electron应用安装在C盘没有权限更新的问题</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/05.html"
+          >如何用Electron+vue+vite构建桌面端应用(三)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/08/04.html"
+          >如何用Electron+vue+vite构建桌面端应用(二)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/22.html"
+          >从源码分析为什么Electron+vue项目中router不能用history模式</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/07/20.html"
+          >如何用Electron+vue+vite构建桌面端应用(一)</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2022/06/15.html"
+          >如何在国产银河麒麟系统Mips架构上离线安装electron</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/11/28.html"
+          >《学习Javascript数据结构和算法》--读书笔记</a
+        >
+      </li>
+        
+      <li>
+        <a href="/blog/articles/2021/10/27.html"
+          >极客时间-正则表达式</a
+        >
+      </li>
+       
+    </ul>
+  </div>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/angularjs/" style="font-size: 10px;">AngularJs</a> <a href="/blog/tags/apache/" style="font-size: 12.22px;">Apache</a> <a href="/blog/tags/arraybuffer/" style="font-size: 10px;">ArrayBuffer</a> <a href="/blog/tags/axios/" style="font-size: 10px;">Axios</a> <a href="/blog/tags/blob/" style="font-size: 10px;">Blob</a> <a href="/blog/tags/bootstrap/" style="font-size: 12.22px;">Bootstrap</a> <a href="/blog/tags/css/" style="font-size: 16.67px;">CSS</a> <a href="/blog/tags/canvas/" style="font-size: 10px;">Canvas</a> <a href="/blog/tags/centos/" style="font-size: 10px;">CentOS</a> <a href="/blog/tags/charles/" style="font-size: 10px;">Charles</a> <a href="/blog/tags/docker/" style="font-size: 13.33px;">Docker</a> <a href="/blog/tags/elementplus/" style="font-size: 10px;">ElementPlus</a> <a href="/blog/tags/eslint/" style="font-size: 10px;">Eslint</a> <a href="/blog/tags/git/" style="font-size: 11.11px;">Git</a> <a href="/blog/tags/gitlab/" style="font-size: 10px;">Gitlab</a> <a href="/blog/tags/gulp/" style="font-size: 10px;">Gulp</a> <a href="/blog/tags/html/" style="font-size: 12.22px;">HTML</a> <a href="/blog/tags/html5/" style="font-size: 10px;">HTML5</a> <a href="/blog/tags/http/" style="font-size: 12.22px;">HTTP</a> <a href="/blog/tags/https/" style="font-size: 10px;">HTTPS</a> <a href="/blog/tags/husky/" style="font-size: 10px;">Husky</a> <a href="/blog/tags/javascript/" style="font-size: 18.89px;">JavaScript</a> <a href="/blog/tags/jenkins/" style="font-size: 10px;">Jenkins</a> <a href="/blog/tags/linux/" style="font-size: 11.11px;">Linux</a> <a href="/blog/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/blog/tags/mutationobserver/" style="font-size: 10px;">MutationObserver</a> <a href="/blog/tags/mysql/" style="font-size: 12.22px;">MySQL</a> <a href="/blog/tags/nginx/" style="font-size: 11.11px;">Nginx</a> <a href="/blog/tags/node-js/" style="font-size: 11.11px;">Node.js</a> <a href="/blog/tags/php/" style="font-size: 14.44px;">PHP</a> <a href="/blog/tags/photoshop/" style="font-size: 10px;">Photoshop</a> <a href="/blog/tags/react/" style="font-size: 10px;">React</a> <a href="/blog/tags/redux/" style="font-size: 10px;">Redux</a> <a href="/blog/tags/regexp/" style="font-size: 10px;">Regexp</a> <a href="/blog/tags/sse/" style="font-size: 10px;">SSE</a> <a href="/blog/tags/sublimetext3/" style="font-size: 10px;">SublimeText3</a> <a href="/blog/tags/svg/" style="font-size: 10px;">Svg</a> <a href="/blog/tags/typescript/" style="font-size: 13.33px;">Typescript</a> <a href="/blog/tags/vagrant/" style="font-size: 10px;">Vagrant</a> <a href="/blog/tags/vim/" style="font-size: 10px;">Vim</a> <a href="/blog/tags/vitest/" style="font-size: 11.11px;">Vitest</a> <a href="/blog/tags/vue/" style="font-size: 10px;">Vue</a> <a href="/blog/tags/vue3/" style="font-size: 14.44px;">Vue3</a> <a href="/blog/tags/web/" style="font-size: 14.44px;">WEB</a> <a href="/blog/tags/webpack/" style="font-size: 12.22px;">Webpack</a> <a href="/blog/tags/wireshark/" style="font-size: 11.11px;">Wireshark</a> <a href="/blog/tags/yii/" style="font-size: 10px;">Yii</a> <a href="/blog/tags/electron/" style="font-size: 15.56px;">electron</a> <a href="/blog/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/blog/tags/jquery/" style="font-size: 12.22px;">jQuery</a> <a href="/blog/tags/kylin/" style="font-size: 10px;">kylin</a> <a href="/blog/tags/lint-staged/" style="font-size: 10px;">lint-staged</a> <a href="/blog/tags/ls-lint/" style="font-size: 10px;">ls-lint</a> <a href="/blog/tags/monorepo/" style="font-size: 10px;">monorepo</a> <a href="/blog/tags/ssh/" style="font-size: 10px;">ssh</a> <a href="/blog/tags/vite/" style="font-size: 13.33px;">vite</a> <a href="/blog/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/blog/tags/vue/" style="font-size: 20px;">vue</a> <a href="/blog/tags/vue3/" style="font-size: 13.33px;">vue3</a> <a href="/blog/tags/%E5%89%8D%E7%AB%AF%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">前端监控</a> <a href="/blog/tags/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F/" style="font-size: 10px;">微信小程序</a> <a href="/blog/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" style="font-size: 17.78px;">数据结构</a> <a href="/blog/tags/%E7%AE%97%E6%B3%95/" style="font-size: 17.78px;">算法</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/bootstrap/">Bootstrap</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/electron/">Electron</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html-css/">HTML-CSS</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/html5/">HTML5</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/javascript/">JavaScript</a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/mysql/">MySQL</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/node-js/">Node.js</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/php/">PHP</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/photoshop/">Photoshop</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/regexp/">Regexp</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/typescript/">Typescript</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/vue3/">Vue3</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/web/">WEB</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/jquery/">jQuery</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%85%B6%E4%BB%96/">其他</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/translation/">前端翻译</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具</a><span class="category-list-count">18</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E5%BC%80%E5%8F%91%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/">开发问题记录</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E7%AE%97%E6%B3%95/">算法</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/blog/categories/notes/">读书笔记</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2026/">2026年</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2023/">2023年</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2022/">2022年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2021/">2021年</a><span class="archive-list-count">40</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2020/">2020年</a><span class="archive-list-count">20</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2019/">2019年</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2018/">2018年</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2017/">2017年</a><span class="archive-list-count">26</span></li><li class="archive-list-item"><a class="archive-list-link" href="/blog/archives/2016/">2016年</a><span class="archive-list-count">27</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-link"></i> 收藏</h3>
+    <div class="widget">
+      <ul>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.mahaixiang.cn/internet/300.html">深入理解互联网协议的原理</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://javascript.ruanyifeng.com/">JavaScript 标准参考教程</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7131211363493347335">JavaScript代码优化之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="https://juejin.cn/post/7224382896626778172">简述 js 的代码整洁之道</a>
+        </li>
+      
+        <li>
+          <a target="_blank" rel="noopener" href="http://www.eggcake.cn/posts/2020-12-19-vue3-core-source-code-0">Vue3.0核心源码解读</a>
+        </li>
+      
+      </ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+        
+      </div>
+      <a id="totop" href="#top"></a>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <p>
+        <a href="/blog/sitemap.xml">网站地图</a>
+        <span> | </span
+        ><a href="/blog/atom.xml">订阅本站</a>
+        <span> | </span
+        ><a href="/blog/about/">联系博主</a>
+      </p>
+      
+      <p>
+        <i class="fa fa-visitors"></i>
+        <i id="busuanzi_container_site_uv"
+          ><i id="busuanzi_value_site_uv"></i
+        ></i>
+        ，
+        <i class="fa fa-views"></i>
+        <i id="busuanzi_container_site_pv"
+          ><i id="busuanzi_value_site_pv"></i
+        ></i>
+      </p>
+      
+      <p>
+        <span
+          >Copyright &copy; 2026 Jesse.</span
+        >
+        <span
+          >Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span
+        >
+      </p>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+  
+<script src="https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+
+<script>
+  hljs.highlightAll();
+</script>
+
+<script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+<script src="/blog/js/search.json.js"></script>
+  
+<script src="https://unpkg.com/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+ 
+<script src="/blog/js/script.js"></script>
+ 
+ 
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?8e59984317ab1777a88e5b3e62c7c767";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+  
+<script src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+ 
+      
+<script src="https://unpkg.com/gitalk@1.7.2/dist/gitalk.min.js"></script>
+ 
+<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js"></script>
+
+<script>
+  var gitalk = new Gitalk({
+    clientID: "3c3e422527fd3f9fa17a",
+    clientSecret: "f28d1808ec9ab69fb24dc3e9fad81e1c3ab8dd83",
+    repo: "blog",
+    owner: "jesse121",
+    admin: ["jesse121"],
+    id: md5(window.location.pathname),
+    proxy: "https://stormy-gorge-51623.herokuapp.com/https://github.com/login/oauth/access_token",
+    distractionFreeMode: false,
+    language: "zh-CN",
+    body: "欢迎在下方提出问题，您的疑问促进我们共同进步！",
+    pagerDirection: "last",
+  });
+  gitalk.render("comments");
+</script>
+         
+ 
+<script
+  type="text/javascript"
+  src="https://unpkg.com/clipboard@2.0.4/dist/clipboard.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="/blog/js/codeBlock/codeBlockFunction.js"
+></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeLang.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeCopy.js"></script>
+<script type="text/javascript" src="/blog/js/codeBlock/codeShrink.js"></script>
+
+</body>
+</html>
